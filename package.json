@@ -1,0 +1,11 @@
+{
+    "name":"24hourchallenge",
+    "version":"0.0.1",
+    "dependencies":{
+        "express":"",
+		"socket.io":"",
+		"connect":"",
+		"mysql":"",
+		"underscore":""
+    }
+}
