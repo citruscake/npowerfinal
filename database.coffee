@@ -31,16 +31,22 @@ exports.getRewards = (callback) ->
 			callback rows
 			return
 
-exports.getUserData = (user_id,callback) ->
-	connection.query "SELECT * FROM users WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
+exports.getUserData = (user_id, callback) ->
+	connection.query "SELECT region_id, provider_id, start_timestamp, tariff_id FROM users WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
 		if error
 			throw error
 		else
 			callback rows
 			return
 					
-exports.getTariffData = (region_id,callback) ->
-	connection.query "SELECT * FROM tariffs WHERE region_id = '"+region_id+"'", (error,rows,fields) ->
+exports.getTariffData = (region_id, callback) ->
+
+	if region_id = '*'
+		query = "SELECT * FROM tariffs WHERE region_id LIKE '%'"
+	else
+		query = "SELECT * FROM tariffs WHERE region_id = '"+region_id+"'"
+		
+	connection.query query, (error,rows,fields) ->
 		if error
 			throw error
 		else
@@ -55,7 +61,36 @@ exports.getTimers = (user_id, callback) ->
 			console.log rows
 			callback rows
 			return
-	
+			
+exports.getUserData = (user_id, callback) ->
+	connection.query "SELECT * FROM users WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
+		if error
+			throw error
+		else
+			console.log rows
+			callback rows
+			return
+
+exports.getRegions = (callback) ->
+
+	connection.query "SELECT * FROM regions", (error,rows,fields) ->
+		if error
+			throw error
+		else
+			console.log rows
+			callback rows
+			return			
+
+exports.getProviders = (callback) ->
+
+	connection.query "SELECT * FROM providers", (error,rows,fields) ->
+		if error
+			throw error
+		else
+			console.log rows
+			callback rows
+			return			
+						
 exports.appendTimeStamp = (user_id, appliance_id, is_active, timestamp, callback) ->
 
 	connection.query "SELECT COUNT(appliance_id) AS count FROM timers WHERE user_id = '"+user_id+"' AND appliance_id = "+appliance_id, (error, rows, fields) ->

@@ -7,13 +7,13 @@
 
   http = require('http');
 
+  socket = require('socket.io');
+
   database = require('./custom_modules/database');
 
   calculator = require('./custom_modules/calculator');
 
   user_id_generator = require('./custom_modules/user_id_generator');
-
-  socket = require('socket.io');
 
   config = require('./custom_modules/config');
 
@@ -35,142 +35,195 @@
 
   server.listen(process.env.VCAP_APP_PORT || 3000);
 
-  app.get('/', function(req, res) {
-    return res.send('Hello from AppFog');
+  app.get('/', function(request, response) {
+    return fs.readFile('./views/index.html', function(error, view) {
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*'
+      });
+      response.write(view);
+      console.log(view);
+      return response.end();
+    });
   });
 
-  /*
-  io.sockets.on 'connection', (socket) ->
-  	socket.on 'clientUserId', (user_id, callback) ->
-  		socket.set 'user_id', user_id, ->
-  			console.log user_id
-  			callback
-  			return
-  		
-  	socket.on 'displayToggle', (data) ->
-  		is_displayed = data.is_displayed
-  		appliance_id = data.appliance_id
-  	
-  		socket.get 'user_id', (error, user_id) ->
-  			database.updateDisplay user_id, appliance_id, is_displayed
-  			socket.emit 'displayToggle', appliance_id, is_displayed
-  		return
-  		
-  	socket.on 'generateUserId', ->
-  		user_id = user_id_generator.generate()
-  		user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
-  		socket.set 'user_id', user_id, ->
-  			console.log user_id
-  			socket.emit 'receiveUserId', user_id
-  		
-  app.get '/appliances/fetch', (request, response) ->
-  
-  	database.getAppliances (appliances) ->
-  		response.writeHead 200, 
-  			'Access-Control-Allow-Origin' : '*'
-  		response.write JSON.stringify(appliances)
-  		response.end()
-  		
-  app.get '/appliance_usage/fetch', (request, response) ->
-  
-  	database.getApplianceUsage (request.query.user_id), (appliance_usage) ->
-  		response.writeHead 200, 
-  			'Access-Control-Allow-Origin' : '*'
-  		response.write JSON.stringify(appliance_usage)
-  		response.end()
-  		
-  app.get '/views/fetch', (request, response) ->
-  	view = request.query.view
-  	switch view
-  		when "realtime" then template = "realtime_view.html"
-  		when "timeline" then template = "timeline_view.html"
-  		when "models" then template = "model_views.html"
-  		
-  	fs.readFile "./views/"+template, (error, template) ->
-  		#console.log template
-  		response.writeHead 200, 
-  			'Access-Control-Allow-Origin' : '*'
-  		response.write template
-  		response.end()
-  		
-  app.get '/timers/fetch', (request, response) ->
-  		database.getTimers (request.query.user_id), (timers) ->
-  			response.writeHead 200, 
-  				'Access-Control-Allow-Origin' : '*'
-  			timer_data = calculator.calculateTerminatedUsage(timers)
-  			response.write JSON.stringify(timer_data)
-  			response.end()
-  
-  app.all '/timer/update/display', (request, response) ->
-  
-  	response.writeHead 200, 
-  		'Access-Control-Allow-Origin' : '*'
-  		'Access-Control-Allow-Methods' : 'PUT'
-  		'Access-Control-Allow-Headers' : 'Content-Type'
-  	
-  	if request.body.appliance_id != undefined 
-  		is_displayed = request.body.is_displayed
-  		appliance_id = request.body.appliance_id
-  		user_id = request.body.user_id
-  	
-  		database.updateDisplay user_id, appliance_id, is_displayed, (status) ->
-  		
-  		response.end()
-  	else
-  		response.end()
-  
-  app.post '/timer/storeTimestamp', (request, response) ->
-  	response.writeHead 200, 
-  		'Access-Control-Allow-Origin' : '*'
-  		'Access-Control-Allow-Methods' : 'POST'
-  		'Access-Control-Allow-Headers' : 'Content-Type'
-  	
-  	#timestamp = new Date().getTime()
-  	timestamp = request.body.timestamp
-  	appliance_id = request.body.appliance_id
-  	is_active = request.body.is_active
-  	is_active = (parseInt(is_active) + 1) % 2
-  	user_id = request.body.user_id
-  	database.appendTimeStamp user_id, appliance_id, is_active, timestamp
-  		
-  	data =
-  		is_active : is_active
-  		
-  	response.write JSON.stringify data
-  	response.end()
-  
-  app.get '/comparisons/generate', (request, response) ->
-  	response.writeHead 200, 
-  		'Access-Control-Allow-Origin' : '*'
-  		'Access-Control-Allow-Methods' : 'POST'
-  		'Access-Control-Allow-Headers' : 'Content-Type'
-  	
-  	user_id = request.query.user_id
-  	end_point = request.query.timestamp
-  	console.log "query!! "+request.query.user_id
-  	
-  	database.getTimers (user_id), (timers) ->
-  		database.getRewards (reward_data) ->
-  			database.getAppliances (appliance_data) ->
-  				database.getUserData (user_id), (user_data) ->
-  					database.getTariffData (user_data[0].region_id), (tariff_data) ->
-  				
-  						timer_data = calculator.calculateTerminatedUsage(timers)
-  									
-  						data =
-  							timer_data : timer_data
-  							end_point : end_point
-  							tariff_data : tariff_data
-  							user_data : user_data[0]
-  							reward_data : reward_data
-  							appliance_data : appliance_data
-  							
-  						console.log data
-  				
-  						comparison_data = calculator.calculateComparisons (data)
-  						response.write JSON.stringify comparison_data
-  						response.end()
-  */
+  app.get('/js/:folder1?/:folder2?/:file', function(request, response) {
+    var data;
+    if (request.params.folder2) {
+      data = fs.readFileSync('./js/' + request.params.folder1 + '/' + request.params.folder2 + '/' + request.params.file);
+    } else if (request.params.folder1) {
+      data = fs.readFileSync('./js/' + request.params.folder1 + '/' + request.params.file);
+    } else {
+      data = fs.readFileSync('./js/' + request.params.file);
+    }
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Content-type': 'application/javascript'
+    });
+    response.write(data);
+    return response.end();
+  });
 
+  app.get('/css/:file', function(request, response) {
+    var data;
+    data = fs.readFileSync('./css/' + request.params.file);
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Content-type': 'text/css'
+    });
+    response.write(data);
+    return response.end();
+  });
+
+  app.get('/appliances/fetch', function(request, response) {
+    return database.getAppliances(function(appliances) {
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*'
+      });
+      response.write(JSON.stringify(appliances));
+      return response.end();
+    });
+  });
+
+  app.get('/appliance_usage/fetch', function(request, response) {
+    return database.getApplianceUsage(request.query.user_id, function(appliance_usage) {
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*'
+      });
+      response.write(JSON.stringify(appliance_usage));
+      return response.end();
+    });
+  });
+
+  app.get('/views/fetch', function(request, response) {
+    var template, view;
+    view = request.query.view;
+    switch (view) {
+      case "realtime":
+        template = "realtime_view.html";
+        break;
+      case "timeline":
+        template = "timeline_view.html";
+        break;
+      case "models":
+        template = "model_views.html";
+    }
+    return fs.readFile("./views/" + template, function(error, template) {
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*'
+      });
+      response.write(template);
+      return response.end();
+    });
+  });
+
+  app.get('/timers/fetch', function(request, response) {
+    return database.getTimers(request.query.user_id, function(timers) {
+      var timer_data;
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*'
+      });
+      timer_data = calculator.calculateTerminatedUsage(timers);
+      response.write(JSON.stringify(timer_data));
+      return response.end();
+    });
+  });
+
+  app.get('/tariff_selector_data/fetch', function(request, response) {
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*'
+    });
+    return database.getRegions(function(region_data) {
+      return database.getProviders(function(provider_data) {
+        return database.getTariffData('*', function(tariff_data) {
+          var tariff_selector_data;
+          tariff_selector_data = {
+            region_data: region_data,
+            provider_data: provider_data,
+            tariff_data: tariff_data
+          };
+          response.write(JSON.stringify(tariff_selector_data));
+          return response.end();
+        });
+      });
+    });
+  });
+
+  app.post('/timer/storeTimestamp', function(request, response) {
+    var appliance_id, data, is_active, timestamp, user_id;
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    timestamp = request.body.timestamp;
+    appliance_id = request.body.appliance_id;
+    is_active = request.body.is_active;
+    is_active = (parseInt(is_active) + 1) % 2;
+    user_id = request.body.user_id;
+    database.appendTimeStamp(user_id, appliance_id, is_active, timestamp);
+    data = {
+      is_active: is_active
+    };
+    response.write(JSON.stringify(data));
+    return response.end();
+  });
+
+  app.get('/users/generateId', function(request, response) {
+    var user_id;
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*'
+    });
+    user_id = user_id_generator.generate();
+    user_id = '2a550081-364e-4aa5-b438-4b21f60c158e';
+    response.write(JSON.stringify(user_id));
+    return response.end();
+  });
+
+  app.get('/users/fetch/:user_id', function(request, response) {
+    var user_id;
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*'
+    });
+    console.log("erere?");
+    user_id = request.params.user_id;
+    return database.getUserData(user_id, function(user_data) {
+      response.write(JSON.stringify(user_data));
+      return response.end();
+    });
+  });
+
+  app.get('/comparisons/generate', function(request, response) {
+    var end_point, user_id;
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*'
+    });
+    user_id = request.query.user_id;
+    end_point = request.query.timestamp;
+    console.log("query!! " + request.query.user_id);
+    return database.getTimers(user_id, function(timers) {
+      return database.getRewards(function(reward_data) {
+        return database.getAppliances(function(appliance_data) {
+          return database.getUserData(user_id, function(user_data) {
+            return database.getTariffData(user_data[0].region_id, function(tariff_data) {
+              var comparison_data, data, timer_data;
+              timer_data = calculator.calculateTerminatedUsage(timers);
+              data = {
+                timer_data: timer_data,
+                end_point: end_point,
+                tariff_data: tariff_data,
+                user_data: user_data[0],
+                reward_data: reward_data,
+                appliance_data: appliance_data
+              };
+              console.log(data);
+              comparison_data = calculator.calculateComparisons(data);
+              response.write(JSON.stringify(comparison_data));
+              return response.end();
+            });
+          });
+        });
+      });
+    });
+  });
 
 }).call(this);

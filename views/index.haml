@@ -1,0 +1,75 @@
+!!!
+%html
+	%head
+		%title 24 Hour Challenge
+		%script{:type => "text/javascript",
+				:src => "http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"}
+		%script{:type => "text/javascript",
+				:src => "http://code.jquery.com/ui/1.10.3/jquery-ui.js"}
+		%script{:type => "text/javascript",
+				:src => "http://use.edgefonts.net/poiret-one.js"}
+		%link{:rel => "stylesheet",
+				:type => "text/css",
+				:href => "http://fonts.googleapis.com/css?family=Cinzel"}
+		%script{:type => "text/javascript",
+				:src => "/js/libs/underscore.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/libs/backbone.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/libs/jquery.timer.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/appliance_models.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/user_model.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/timer_models.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/comparison_models.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/client.js"}
+		//%script{:type => "text/javascript",
+		// 		:src => "http://127.0.0.1:3000/socket.io/socket.io.js"}
+		%script{:type => "text/javascript",
+		 		:src => "/socket.io/socket.io.js"}
+		%script{:type => "text/javascript",
+				:src => "/js/libs/jquery-cookie-master/jquery.cookie.js"}
+		%link{:rel => "stylesheet",
+				:type => "text/css",
+				:href => "/css/bootstrap.css"}
+		%link{:rel => "stylesheet",
+				:type => "text/css",
+				:href => "/css/styles.css"}
+		
+	%body
+		#app_container.container-fluid
+			#app_header.row-fluid
+				#app_nav.span6
+					.row-fluid
+						.span5
+							#brand-frame
+								.brand
+									24 Hour
+									%br
+									Challenge
+						.span7
+							.navbar
+								.navbar-inner
+									%ul{:class => 'nav', :id => 'app_menu'}
+										%li
+											%a{:href => "#",
+											:id => "realtime_view_link"}
+												My timings
+										%li
+											%a{:href => "#",
+											:id => "timeline_view_link"}
+												My savings
+				#app_tariff_data.span6
+					.row-fluid
+						#total_cost_frame.span8.pull-right
+							#total_cost.pull-right
+								&#163;36.21
+					.row-fluid
+						#tariff_options_frame.span8.pull-right
+			#page_container.row-fluid.clearfix
+			
+		#app_templates

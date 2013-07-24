@@ -1,0 +1,107 @@
+<script id='app_button' type='text/template'>
+  <div class='row-fluid'>
+    <h5>
+      <%= name %>
+    </h5>
+  </div>
+</script>
+<script id='app_timer' type='text/template'>
+  <div class='row-fluid'>
+    <div class='span11'>
+      <div class='timer_container'>
+        <div class='row-fluid'>
+          <div class='span2'>
+            <div class='timer_icon_container img-circle'>
+              <h5>
+                <%= name %>
+              </h5>
+            </div>
+          </div>
+          <div class='span8'>
+            <div class='timeline_container'>
+              <div class='row-fluid'>
+                <div class='span12'>
+                  <div class='marker_frame' style='margin-left:0px;'>
+                    <h5>
+                      0
+                    </h5>
+                  </div>
+                  <div class='marker_frame' style='margin-left:95px;'>
+                    <h5>
+                      6
+                    </h5>
+                  </div>
+                  <div class='marker_frame' style='margin-left:191px;'>
+                    <h5>
+                      12
+                    </h5>
+                  </div>
+                  <div class='marker_frame' style='margin-left:286px;'>
+                    <h5>
+                      18
+                    </h5>
+                  </div>
+                  <div class='marker_frame' style='margin-left:382px;'>
+                    <h5>
+                      24
+                    </h5>
+                  </div>
+                </div>
+              </div>
+              <div class='row-fluid'>
+                <div class='span12'>
+                  <div class='timeline_frame'>
+                    <div class='timeline_block'></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class='span2'></div>
+        </div>
+      </div>
+    </div>
+    <div class='span1'>
+      <div class='arrow_box'></div>
+    </div>
+  </div>
+</script>
+<script id='comparison_frame' type='text/template'>
+  <div class='row-fluid'>
+    To save &#163;<%= daily_saving %>a day / &#163;<%= yearly_saving %> a year...
+  </div>
+  <div class='row-fluid'>
+    <div class='span4'>
+      <% _.each(appliance_usages, function(appliance_usage) { %>
+      	<b><%= appliance_usage.appliance_id %></b></br>
+      	<b><%= appliance_usage.reduction_timestamp %></b>
+      <% }); %>
+    </div>
+    <div class='span4'></div>
+    <div class='span4'></div>
+  </div>
+</script>
+<script id='tariff_selector' type='text/template'>
+  <div class='row-fluid'>
+    <div class='span4' id='select_region_frame'>
+      <select id='region_select'>
+        <% _.each(region_data, function(region) { %>
+        	<b><%= region.name %></b>
+        <% }); %>
+        <div class='span4' id='select_provider_frame'>
+          <select id='provider_select'></select>
+        </div>
+        <option>
+          provider
+        </option>
+        <div class='span4' id='select_tariff_frame'>
+          <select id='tariff_select'>
+            <option>
+              tariff
+            </option>
+          </select>
+        </div>
+      </select>
+    </div>
+  </div>
+</script>

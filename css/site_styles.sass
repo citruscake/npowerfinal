@@ -1,0 +1,103 @@
+@mixin select
+	width : 100%
+	font-family : poiret-one, sans-serif
+	font-size : 15px
+	color : #666666
+	line-height : 40px
+	height : 40px
+	margin-left: 0px
+	
+html
+	height : 100%
+	
+body
+	height : 100%
+	background-color : #eeeeee
+
+#app_templates
+	display : none
+	
+#app_container
+	#app_header
+		height : 120px
+		background-color : #dddddd
+		border-width : 0px 0px 2px 0px
+		border-color : #cccccc
+		border-style : solid
+		#app_nav
+			min-width : 660px
+			.row-fluid
+				.span5
+					#brand-frame
+						background-color : #cccccc
+						width : 190px
+						height : 120px
+						margin-left : 30px
+						.brand
+							font-family : poiret-one, sans-serif
+							//font-family : Cinzel, sans-serif
+							font-size : 38px
+							line-height : 40px
+							color : #eeeeee
+							position : relative
+							padding : 10px 10px 0px 10px
+							text-shadow: 1px 1px 2px #cccccc
+							filter: dropshadow(color=#cccccc, offx=1, offy=1)
+							padding-top : 20px
+				.span7
+					.navbar
+						height : 120px
+						margin-bottom : 0px
+						.navbar-inner
+							height : 120px
+							background-color : transparent
+							background-image : none
+							position : absolute
+							border : none
+							box-shadow : none
+							ul#app_menu
+								margin-left : 5px
+								bottom : 0px
+								position : absolute
+								width : 400px
+								li
+									font-family : poiret-one, sans-serif
+									font-size : 30px
+									color : #eeeeee
+									background-color : #ffffff
+									padding : 10px 5px 10px 5px
+									margin-right : 5px
+									border-radius : 3px 3px 0px 0px
+		#app_tariff_data
+			.row-fluid
+				height : 70px
+				#total_cost_frame
+					height : 50px
+					width : 350px
+					background-color : #cccccc
+					margin-top : 10px
+					margin-right : 10px
+					#total_cost
+						height : 40px
+						//width : 250px
+						background-color : #aaaaaa
+						font-size : 40px
+						font-family : poiret-one, sans-serif
+						line-height : 30px
+						padding : 10px 0px 0px 0px
+						margin-right : 5px
+			.row-fluid
+				#tariff_options_frame
+					.row-fluid
+						#select_region_frame
+							margin-left : 3px
+							#region_select
+								@include select
+						#select_provider_frame
+							margin-left : 3px
+							#provider_select
+								@include select
+						#select_tariff_frame
+							margin-left : 3px
+							#tariff_select
+								@include select

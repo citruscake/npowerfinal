@@ -1,0 +1,16 @@
+#timeline_view .row-fluid .span12 {
+  width: 95%;
+  margin-left: 2.5%;
+}
+
+#graph_container {
+  width: 700px;
+  height: 300px;
+  background-color: #dddddd;
+}
+
+#summary_container {
+  width: 700px;
+  height: 400px;
+  background-color: #cccccc;
+}

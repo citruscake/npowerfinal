@@ -42,7 +42,7 @@
   };
 
   exports.getUserData = function(user_id, callback) {
-    return connection.query("SELECT * FROM users WHERE user_id = '" + user_id + "'", function(error, rows, fields) {
+    return connection.query("SELECT region_id, provider_id, start_timestamp, tariff_id FROM users WHERE user_id = '" + user_id + "'", function(error, rows, fields) {
       if (error) {
         throw error;
       } else {
@@ -52,7 +52,13 @@
   };
 
   exports.getTariffData = function(region_id, callback) {
-    return connection.query("SELECT * FROM tariffs WHERE region_id = '" + region_id + "'", function(error, rows, fields) {
+    var query;
+    if (region_id = '*') {
+      query = "SELECT * FROM tariffs WHERE region_id LIKE '%'";
+    } else {
+      query = "SELECT * FROM tariffs WHERE region_id = '" + region_id + "'";
+    }
+    return connection.query(query, function(error, rows, fields) {
       if (error) {
         throw error;
       } else {
@@ -63,6 +69,39 @@
 
   exports.getTimers = function(user_id, callback) {
     return connection.query("SELECT appliance_id, is_active, timestamp_string FROM timers WHERE user_id = '" + user_id + "'", function(error, rows, fields) {
+      if (error) {
+        throw error;
+      } else {
+        console.log(rows);
+        callback(rows);
+      }
+    });
+  };
+
+  exports.getUserData = function(user_id, callback) {
+    return connection.query("SELECT * FROM users WHERE user_id = '" + user_id + "'", function(error, rows, fields) {
+      if (error) {
+        throw error;
+      } else {
+        console.log(rows);
+        callback(rows);
+      }
+    });
+  };
+
+  exports.getRegions = function(callback) {
+    return connection.query("SELECT * FROM regions", function(error, rows, fields) {
+      if (error) {
+        throw error;
+      } else {
+        console.log(rows);
+        callback(rows);
+      }
+    });
+  };
+
+  exports.getProviders = function(callback) {
+    return connection.query("SELECT * FROM providers", function(error, rows, fields) {
       if (error) {
         throw error;
       } else {

@@ -1,0 +1,72 @@
+%script{:type => "text/template", :id => "app_button"}
+	.row-fluid
+		%h5
+			<%= name %>
+			
+%script{:type => "text/template", :id => "app_timer"}
+	.row-fluid
+		.span11
+			.timer_container
+				.row-fluid
+					.span2
+						.timer_icon_container.img-circle
+							%h5
+								<%= name %>
+					.span8
+						.timeline_container
+							.row-fluid
+								.span12
+									.marker_frame{:style=>"margin-left:0px;"}
+										%h5
+											0
+									.marker_frame{:style=>"margin-left:95px;"}
+										%h5
+											6
+									.marker_frame{:style=>"margin-left:191px;"}
+										%h5
+											12
+									.marker_frame{:style=>"margin-left:286px;"}
+										%h5
+											18
+									.marker_frame{:style=>"margin-left:382px;"}
+										%h5
+											24
+							.row-fluid
+								.span12
+									.timeline_frame
+										.timeline_block
+					.span2
+		.span1
+			.arrow_box
+%script{:type => "text/template", :id => "comparison_frame"}
+	.row-fluid
+		To save &#163;<%= daily_saving %>a day / &#163;<%= yearly_saving %> a year...
+	.row-fluid
+		.span4
+			:plain
+				<% _.each(appliance_usages, function(appliance_usage) { %>
+					<b><%= appliance_usage.appliance_id %></b></br>
+					<b><%= appliance_usage.reduction_timestamp %></b>
+				<% }); %>
+				
+		.span4
+		
+		
+		.span4
+%script{:type => "text/template", :id => "tariff_selector"}
+	.row-fluid
+		#select_region_frame.span4
+			%select{:id => 'region_select'}
+				:plain
+					<% _.each(region_data, function(region) { %>
+						<b><%= region.name %></b>
+					<% }); %>
+				#select_provider_frame.span4
+					%select{:id => 'provider_select'}
+				%option
+					provider
+				#select_tariff_frame.span4
+					%select{:id => 'tariff_select'}
+						%option
+							tariff
+		

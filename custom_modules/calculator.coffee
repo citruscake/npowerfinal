@@ -23,7 +23,6 @@ exports.calculateTerminatedUsage = (timers) ->
 		else
 			is_active = 0
 			
-
 		if is_active == 1
 			start_timestamp = timestamps[timestamps.length-1]
 		else
