@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, fetchModels, fetchTariffs, formatTimestamp, initCalculator, realtime_view, timeline_view, timerCollection, timerCollectionView, userModel;
+    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, fetchModels, formatTimestamp, initialisePageCalculator, initialiseTariffSelector, realtime_view, timeline_view, timerCollection, timerCollectionView;
     timeline_view = null;
     realtime_view = null;
     applianceCollection = null;
@@ -9,15 +9,18 @@
     timerCollectionView = null;
     comparisonCollection = null;
     comparisonCollectionView = null;
-    userModel = null;
+    window.user = null;
+    window.tariff = null;
     fetchModels = function() {
       return applianceCollection.fetch({
         success: function(collection, response) {
+          console.log(applianceCollection.models);
           return timerCollection.fetch({
             data: {
-              user_id: window.user_id
+              user_id: window.user.get('user_id')
             },
             success: function(collection, response) {
+              timerCollection.addDummyTimers(applianceCollection.models);
               return $('#realtime_view_link').trigger('click');
             },
             error: function(h, response) {}
@@ -26,48 +29,65 @@
         error: function(h, response) {}
       });
     };
-    fetchTariffs = function() {
-      return $.get("/tariff_selector_data/fetch", function(response) {
-        var tariff_selector_data, template_data;
-        tariff_selector_data = $.parseJSON(response);
-        template_data = {
-          user_data: userModel.toJSON()[0],
-          tariff_selector_data: tariff_selector_data
-        };
-        console.log(template_data);
-        return $('#tariff_options_frame').html(_.template(template_data));
-      });
-    };
-    initCalculator = function() {
-      var formatted_time, timer, total_timestamp, updateTimer, _i, _len, _ref;
+    initialisePageCalculator = function() {
+      var appliance, appliance_id, formatted_time, running_cost, timer, total_timestamp, unit_rate, updateTimer, wattage, _i, _len, _ref;
+      unit_rate = window.tariff.unit_rate;
       _ref = timerCollection.models;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         timer = _ref[_i];
+        appliance_id = timer.get('appliance_id');
+        appliance = applianceCollection.get(appliance_id);
+        wattage = appliance.get('wattage');
         if (timer.get('is_active') === 0) {
           total_timestamp = timer.get('total_timestamp');
-          formatted_time = formatTimestamp(total_timestamp);
-          $('#' + timer.get('appliance_id') + '.timer-display').html(formatted_time);
+          if (total_timestamp > 0) {
+            formatted_time = formatTimestamp(total_timestamp);
+            $('#' + timer.get('appliance_id') + '.time-display').html(formatted_time);
+            running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
+            $('#' + timer.get('appliance_id') + '.cost-display').html(running_cost);
+          }
         }
       }
       updateTimer = function() {
-        var start_timestamp, _j, _len1, _ref1, _results;
+        var is_active, start_timestamp, total_cost, _j, _len1, _ref1;
         window.current_timestamp = (new Date).getTime();
+        total_cost = parseFloat(window.tariff.standing_charge);
+        unit_rate = window.tariff.unit_rate;
         _ref1 = timerCollection.models;
-        _results = [];
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
           timer = _ref1[_j];
-          if (timer.get('is_active') === 1) {
+          appliance_id = timer.get('appliance_id');
+          appliance = applianceCollection.get(appliance_id);
+          wattage = appliance.get('wattage');
+          is_active = timer.get('is_active');
+          total_timestamp = timer.get('total_timestamp');
+          if (is_active === 1) {
             start_timestamp = timer.get('start_timestamp');
-            total_timestamp = timer.get('total_timestamp') + current_timestamp - start_timestamp;
+            total_timestamp += current_timestamp - start_timestamp;
             formatted_time = formatTimestamp(total_timestamp);
-            _results.push($('#' + timer.get('appliance_id') + '.timer-display').html(formatted_time));
-          } else {
-            _results.push(void 0);
+            $('#' + timer.get('appliance_id') + '.time-display').html(formatted_time);
           }
+          running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
+          total_cost += running_cost;
+          $('#' + timer.get('appliance_id') + '.cost-display').html(running_cost);
         }
-        return _results;
+        return $('#total_cost').html(total_cost);
       };
       return $.timer(updateTimer, 200, true);
+    };
+    initialiseTariffSelector = function() {
+      var tariffSelector;
+      tariffSelector = new TariffSelectorModel();
+      return tariffSelector.fetch({
+        success: function(model, response) {
+          var tariffSelectorView;
+          tariffSelectorView = new TariffSelectorView({
+            model: tariffSelector
+          });
+          $('#tariff_options_frame').html(tariffSelectorView.render(window.user).el);
+          return tariffSelectorView.updateTariffData();
+        }
+      });
     };
     formatTimestamp = function(timestamp) {
       var formatted_hours, formatted_milliseconds, formatted_minutes, formatted_seconds, formatted_time, time;
@@ -117,29 +137,12 @@
             return $.get("/views/fetch", {
               view: 'realtime'
             }, function(template) {
-              var animate_ids, appliance, appliance_id, appliances, is_displayed, timer, timer_el, timer_ids, _i, _len;
+              var appliances;
               $('#app_templates').append(template);
               $('#page_container').append($(template).html());
-              timer_ids = [];
               appliances = applianceCollection.models;
-              for (_i = 0, _len = appliances.length; _i < _len; _i++) {
-                appliance = appliances[_i];
-                appliance_id = appliance.get('appliance_id');
-                timer = timerCollection.get(appliance_id);
-                if (timer) {
-                  console.log(timer);
-                  is_displayed = timer.get('is_displayed');
-                  timer_ids.push(appliance);
-                }
-              }
-              timer_el = timerCollectionView.render(appliances, timer_ids).el;
-              $('#timer_gallery').html(timer_el);
-              initCalculator();
-              animate_ids = [];
-              $(timer_el).children('li').animate({
-                opacity: 1
-              }, 300);
-              return false;
+              $('#timer_gallery').html(timerCollectionView.render(appliances).el);
+              return initialisePageCalculator();
             });
           } else {
             timeline_view = $('#timeline_view').detach();
@@ -177,6 +180,7 @@
       initialiseApplianceModels();
       initialiseTimerModels();
       initialiseComparisonModels();
+      initialiseTariffSelectorModel();
       initialiseUserModel();
       applianceCollection = new ApplianceCollection;
       applianceCollectionView = new ApplianceCollectionView({
@@ -186,7 +190,7 @@
       timerCollectionView = new TimerCollectionView({
         collection: timerCollection
       });
-      userModel = new UserModel();
+      window.user = new UserModel();
       if (typeof ($.cookie('user_id')) !== 'undefined') {
         return $.get("/users/generateId", function(response) {
           var user_id;
@@ -195,26 +199,26 @@
             expires: 1,
             path: '/'
           });
-          userModel = new UserModel({
+          window.user = new UserModel({
             user_id: user_id
           });
-          return userModel.fetch({
+          return window.user.fetch({
             success: function(model, response) {
               fetchModels();
-              return fetchTariffs();
+              return initialiseTariffSelector();
             }
           });
         });
       } else {
         user_id = $.cookie('user_id');
         $.cookie('user_id').expires = 1;
-        userModel = new UserModel({
+        window.user = new UserModel({
           user_id: user_id
         });
-        return userModel.fetch({
+        return window.user.fetch({
           success: function(model, response) {
             fetchModels();
-            return fetchTariffs();
+            return initialiseTariffSelector();
           }
         });
       }

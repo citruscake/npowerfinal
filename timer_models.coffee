@@ -18,6 +18,10 @@ window.initialiseTimerModels = ->
 			is_active = this.model.get 'is_active'
 			if is_active == 1
 				timestamp = window.current_timestamp
+				start_timestamp = this.model.get 'start_timestamp'
+				total_timestamp = this.model.get 'total_timestamp'
+				total_timestamp += timestamp - start_timestamp
+				this.model.set 'total_timestamp', total_timestamp
 				this.model.set 'start_timestamp', ''
 			else
 				timestamp = (new Date).getTime()
@@ -28,34 +32,38 @@ window.initialiseTimerModels = ->
 			data = 
 				appliance_id : appliance_id
 				is_active : this.model.get 'is_active'
-				user_id : window.user_id
+				user_id : window.user.get 'user_id'
 				timestamp : timestamp
 			timer = this
 			
 			$.post '/timer/storeTimestamp', data, (response) ->
 				response = JSON.parse response
 				timer.model.set 'is_active', response.is_active
+				console.log "is_Active "+response.is_active
 				timer.animate appliance_id, response.is_active
 
 		animate : (appliance_id, is_active) ->
 			if is_active == 0 #will become 1
 				$(this.el).animate
-					'background-color' : '#cccccc'
+					'background-color' : '#eeeeee'
 				,1000			
 			else if is_active == 1 #will become 0
 				$(this.el).animate
-					'background-color' : '#333333'
+					'background-color' : '#cccccc'
 				,1000
 				
-		render : (appliance, has_timer) ->
+		render : (appliance) ->
 
 			this.template = this['template1']
-			console.log this.model
-			console.log appliance
-			if has_timer 
-				attributes = $.extend {}, this.model.toJSON()
-			attributes = $.extend attributes, appliance.toJSON()
+			#console.log this.model
+			#console.log appliance
+			#if has_timer 
+			#	attributes = $.extend {}, this.model.toJSON()
+			#attributes = $.extend attributes, appliance.toJSON()
+			attributes = $.extend this.model.toJSON(), appliance.toJSON()
 			this.$el.html this.template attributes
+			console.log "attributes..."
+			console.log attributes
 			$(this.el).addClass 'thumbnail'
 			#$(this.el).addClass 'ui-state-default'
 			$(this.el).attr 'id', appliance.get 'appliance_id'
@@ -74,33 +82,36 @@ window.initialiseTimerModels = ->
 	window.TimerCollectionView = Backbone.View.extend
 		tagName : 'ul'
 				
-		render : (appliances, timer_ids) ->
+		render : (appliances) ->
 
 			for appliance in appliances
-				appliance_id = appliance.get 'appliance_id'
-				if $.inArray appliance_id, timer_ids
-					this.renderTimer appliance, true
-				else
-					this.renderTimer appliance, false
+			#_.each appliances, (appliance) ->
+				this.renderTimer appliance
+				
+				#appliance_id = appliance.get 'appliance_id'
+				#if $.inArray(appliance_id, timer_ids) == -1
+				#	this.renderTimer appliance, false
+				#else
+				#	this.renderTimer appliance, false
 
 			$(this.el).addClass 'thumbnails' 
 			
 			return this
 			
-		renderTimer : (appliance, has_timer) ->
+		renderTimer : (appliance) ->
 			appliance_id = appliance.get 'appliance_id'
 			timerModel = this.collection.get appliance_id
-			if timerModel != undefined
-				timerView = new TimerView
-					model : timerModel
-			else
-				timerModel = new TimerModel
-					appliance_id : appliance_id
-					is_active : 0
-					total_timestamp : 0
-					start_timestamp : (new Date).getTime()
-				timerView = new TimerView
-					model : timerModel
+			#if timerModel != undefined
+			timerView = new TimerView
+				model : timerModel
+			#else
+			#	timerModel = new TimerModel
+			#		appliance_id : appliance_id
+			#		is_active : 0
+			#		total_timestamp : 0
+			#		start_timestamp : ""
+			#	timerView = new TimerView
+			#		model : timerModel
 					
 			this.$el.append timerView.render(appliance).el
 
@@ -114,3 +125,15 @@ window.initialiseTimerModels = ->
 			if model.methodURL && model.methodURL[method.toLowerCase()]
 				options.url = model.methodURL[method.toLowerCase()]
 			Backbone.sync(method, model, options)
+		addDummyTimers : (appliances) ->
+			for appliance in appliances
+				appliance_id = appliance.get 'appliance_id'
+				timerModel = this.get appliance_id
+				if timerModel == undefined
+					timerModel = new TimerModel
+						appliance_id : appliance_id
+						is_active : 0
+						total_timestamp : 0
+						start_timestamp : ""
+					this.add timerModel
+			

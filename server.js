@@ -168,6 +168,23 @@
     return response.end();
   });
 
+  app.all('/users/save', function(request, response) {
+    var provider_id, region_id, tariff_id, user_id;
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    user_id = request.body.user_id;
+    region_id = request.body.region_id;
+    provider_id = request.body.provider_id;
+    tariff_id = request.body.tariff_id;
+    return database.saveUserData(user_id, region_id, provider_id, tariff_id, function(status) {
+      response.write(JSON.stringify(status));
+      return response.end();
+    });
+  });
+
   app.get('/users/generateId', function(request, response) {
     var user_id;
     response.writeHead(200, {
@@ -187,7 +204,7 @@
     console.log("erere?");
     user_id = request.params.user_id;
     return database.getUserData(user_id, function(user_data) {
-      response.write(JSON.stringify(user_data));
+      response.write(JSON.stringify(user_data[0]));
       return response.end();
     });
   });
@@ -204,14 +221,14 @@
       return database.getRewards(function(reward_data) {
         return database.getAppliances(function(appliance_data) {
           return database.getUserData(user_id, function(user_data) {
-            return database.getTariffData(user_data[0].region_id, function(tariff_data) {
+            return database.getTariffData(user_data.region_id, function(tariff_data) {
               var comparison_data, data, timer_data;
               timer_data = calculator.calculateTerminatedUsage(timers);
               data = {
                 timer_data: timer_data,
                 end_point: end_point,
                 tariff_data: tariff_data,
-                user_data: user_data[0],
+                user_data: user_data,
                 reward_data: reward_data,
                 appliance_data: appliance_data
               };

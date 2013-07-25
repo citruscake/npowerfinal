@@ -130,6 +130,21 @@ app.post '/timer/storeTimestamp', (request, response) ->
 	response.write JSON.stringify data
 	response.end()
 
+app.all '/users/save', (request, response) ->
+	response.writeHead 200, 
+		'Access-Control-Allow-Origin' : '*'
+		'Access-Control-Allow-Methods' : 'POST'
+		'Access-Control-Allow-Headers' : 'Content-Type'
+		
+	user_id = request.body.user_id
+	region_id = request.body.region_id
+	provider_id = request.body.provider_id
+	tariff_id = request.body.tariff_id
+	database.saveUserData user_id, region_id, provider_id, tariff_id, (status) ->
+		response.write JSON.stringify status
+		response.end()
+			
+	
 app.get '/users/generateId', (request, response) ->
 	response.writeHead 200,
 		'Access-Control-Allow-Origin' : '*'
@@ -144,7 +159,7 @@ app.get '/users/fetch/:user_id', (request, response) ->
 	console.log "erere?"
 	user_id = request.params.user_id
 	database.getUserData (user_id), (user_data) ->
-		response.write JSON.stringify user_data
+		response.write JSON.stringify user_data[0]
 		response.end()
 	
 app.get '/comparisons/generate', (request, response) ->
@@ -159,7 +174,7 @@ app.get '/comparisons/generate', (request, response) ->
 		database.getRewards (reward_data) ->
 			database.getAppliances (appliance_data) ->
 				database.getUserData (user_id), (user_data) ->
-					database.getTariffData (user_data[0].region_id), (tariff_data) ->
+					database.getTariffData (user_data.region_id), (tariff_data) ->
 				
 						timer_data = calculator.calculateTerminatedUsage(timers)
 									
@@ -167,7 +182,7 @@ app.get '/comparisons/generate', (request, response) ->
 							timer_data : timer_data
 							end_point : end_point
 							tariff_data : tariff_data
-							user_data : user_data[0]
+							user_data : user_data
 							reward_data : reward_data
 							appliance_data : appliance_data
 							

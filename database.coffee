@@ -38,7 +38,15 @@ exports.getUserData = (user_id, callback) ->
 		else
 			callback rows
 			return
-					
+
+exports.saveUserData = (user_id, region_id, provider_id, tariff_id, callback) ->			
+	connection.query "UPDATE users SET region_id = '"+region_id+"', provider_id = '"+provider_id+"', tariff_id = '"+tariff_id+"' WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
+		if error
+			throw error
+		else
+			callback "success"
+			return	
+	
 exports.getTariffData = (region_id, callback) ->
 
 	if region_id = '*'

@@ -8,52 +8,82 @@ $ ->
 	timerCollectionView = null
 	comparisonCollection = null
 	comparisonCollectionView = null	
-	userModel = null
-		
+	window.user = null
+	window.tariff = null
+	
 	#window.user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
 			
 	fetchModels = ->
 
 		applianceCollection.fetch
 			success : (collection,response) ->
+				console.log applianceCollection.models
 				timerCollection.fetch
 					data :
-						user_id : window.user_id
+						user_id : window.user.get 'user_id'
 					success : (collection,response) ->
+						timerCollection.addDummyTimers applianceCollection.models
 						$('#realtime_view_link').trigger 'click'
 					error : (h,response) ->	
 			error : (h,response) ->
 	
-	fetchTariffs = ->
-		
-		$.get "/tariff_selector_data/fetch", (response) ->
-			tariff_selector_data = $.parseJSON response
-			template_data =
-				user_data : userModel.toJSON()[0]
-				tariff_selector_data : tariff_selector_data
-			console.log template_data
-			$('#tariff_options_frame').html _.template template_data
-				
-	initCalculator = ->
+	initialisePageCalculator = ->
 
+		unit_rate = window.tariff.unit_rate
+	
 		for timer in timerCollection.models
+			appliance_id = timer.get 'appliance_id'
+			appliance = applianceCollection.get appliance_id
+			wattage = appliance.get 'wattage'
+			
 			if timer.get('is_active') == 0
 				total_timestamp = timer.get('total_timestamp') 
-				formatted_time = formatTimestamp total_timestamp
-				$('#'+timer.get('appliance_id')+'.timer-display').html(formatted_time)
+				if total_timestamp > 0
+					formatted_time = formatTimestamp total_timestamp
+					$('#'+timer.get('appliance_id')+'.time-display').html formatted_time
+					running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
+					$('#'+timer.get('appliance_id')+'.cost-display').html running_cost
 	
 		updateTimer = ->
 			window.current_timestamp = (new Date).getTime()
+			total_cost = parseFloat window.tariff.standing_charge
+			#console.log "total_cost is "+window.tariff.standing_charge
+			
+			unit_rate = window.tariff.unit_rate
 			for timer in timerCollection.models
-				if timer.get('is_active') == 1
+				appliance_id = timer.get 'appliance_id'
+				appliance = applianceCollection.get appliance_id
+				wattage = appliance.get 'wattage'
+				is_active = timer.get 'is_active'
+				total_timestamp = timer.get('total_timestamp')
+				
+				if is_active == 1
 					start_timestamp = timer.get 'start_timestamp'
-					total_timestamp = timer.get('total_timestamp') + current_timestamp - start_timestamp
+					total_timestamp += current_timestamp - start_timestamp
 					formatted_time = formatTimestamp total_timestamp
-					$('#'+timer.get('appliance_id')+'.timer-display').html(formatted_time)
-
+					$('#'+timer.get('appliance_id')+'.time-display').html formatted_time
+				
+				running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
+				total_cost += running_cost
+				#console.log "adding "+running_cost
+				
+				#if is_active == 1
+				$('#'+timer.get('appliance_id')+'.cost-display').html running_cost
 					
+			$('#total_cost').html total_cost
+			
 		$.timer(updateTimer, 200, true)
+	
+	initialiseTariffSelector = ->
 		
+		tariffSelector = new TariffSelectorModel()
+		tariffSelector.fetch
+			success : (model,response) ->
+				tariffSelectorView = new TariffSelectorView
+					model : tariffSelector
+				$('#tariff_options_frame').html tariffSelectorView.render(window.user).el
+				tariffSelectorView.updateTariffData()
+	
 	formatTimestamp = (timestamp) ->
 		time = new Date timestamp
 		formatted_hours = String time.getHours()
@@ -97,33 +127,12 @@ $ ->
 				$.get "/views/fetch", { view : 'realtime' }, (template) ->
 					$('#app_templates').append template
 					$('#page_container').append $(template).html()
-					#$('#appliance_list').html applianceCollectionView.render().el
-					
-					timer_ids = []
+
 					appliances = applianceCollection.models
-					for appliance in appliances
 
-						appliance_id = appliance.get 'appliance_id'
-						timer = timerCollection.get appliance_id
-						if timer
-							console.log timer
-							is_displayed = timer.get 'is_displayed'
-		
-							#if is_displayed == 1
-							timer_ids.push appliance
-
-					timer_el = timerCollectionView.render(appliances, timer_ids).el
-					$('#timer_gallery').html timer_el
+					$('#timer_gallery').html timerCollectionView.render(appliances).el
 									
-					initCalculator()
-					
-					animate_ids = []
-
-					$(timer_el).children('li').animate
-						opacity : 1
-					,300
-					return false
-					
+					initialisePageCalculator()	
 			else
 				timeline_view = $('#timeline_view').detach()
 				$('#page_container').append realtime_view
@@ -150,6 +159,7 @@ $ ->
 		initialiseApplianceModels()
 		initialiseTimerModels()
 		initialiseComparisonModels()
+		initialiseTariffSelectorModel()
 		initialiseUserModel()
 		
 		applianceCollection = new ApplianceCollection
@@ -160,29 +170,27 @@ $ ->
 		timerCollectionView = new TimerCollectionView
 			collection : timerCollection
 		
-		userModel = new UserModel()
-		
+		window.user = new UserModel()
+			
 		if typeof($.cookie 'user_id') != 'undefined'
 			$.get "/users/generateId", (response) ->
 				user_id = $.parseJSON response
 				$.cookie 'user_id', user_id, 
 					expires : 1
 					path : '/'	
-				userModel = new UserModel
+				window.user = new UserModel
 					user_id : user_id
-				userModel.fetch
+				window.user.fetch
 					success : (model,response) ->
 						fetchModels()
-						fetchTariffs()
-				
+						initialiseTariffSelector()
 		else
 			user_id = $.cookie 'user_id'
 			#window.user_id = user_id
 			$.cookie('user_id').expires = 1
-			userModel = new UserModel
+			window.user = new UserModel
 				user_id : user_id
-			userModel.fetch
+			window.user.fetch
 				success : (model,response) ->
 					fetchModels()
-					fetchTariffs()
-	
+					initialiseTariffSelector()

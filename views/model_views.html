@@ -65,6 +65,10 @@
       <div class='arrow_box'></div>
     </div>
   </div>
+  <div class='row-fluid'>
+    <div id='<%= appliance_id %>' class='time-display span6'></div>
+    <div id='<%= appliance_id %>' class='cost-display span6'></div>
+  </div>
 </script>
 <script id='comparison_frame' type='text/template'>
   <div class='row-fluid'>
@@ -82,25 +86,60 @@
   </div>
 </script>
 <script id='tariff_selector' type='text/template'>
+  <%
+  	region_data = _.sortBy(tariff_selector_data.region_data, function(region) {
+  		return region.title;
+  	});
+  	
+  	regional_tariffs = _.filter(tariff_selector_data.tariff_data,function(tariff) {
+  		return tariff.region_id === user_data.region_id;
+  	});
+  	provider_ids = _.uniq(regional_tariffs, function(tariff) {
+  		return tariff.provider_id;
+  	});
+  	
+  	provider_data = _.sortBy(_.filter(tariff_selector_data.provider_data, function(provider) {
+  		return $.inArray(provider.provider_id, provider_ids);
+  	}), function(provider) {
+  		return provider.title;
+  	});
+  	tariff_data = _.filter(tariff_selector_data.tariff_data, function(tariff) {
+  		return ((tariff.provider_id === user_data.provider_id) && (tariff.region_id === user_data.region_id))
+  	});
+  	
+  %>
   <div class='row-fluid'>
     <div class='span4' id='select_region_frame'>
       <select id='region_select'>
-        <% _.each(region_data, function(region) { %>
-        	<b><%= region.name %></b>
+        <% _.each(region_data, function(region) { 
+        	if (region.region_id === user_data.region_id) { %>
+        		<option value="<%= region.region_id %>" selected><%= region.title %></option>
+        	<% } else { %>
+        		<option value="<%= region.region_id %>"><%= region.title %></option>
+        	<% } %>
         <% }); %>
-        <div class='span4' id='select_provider_frame'>
-          <select id='provider_select'></select>
-        </div>
-        <option>
-          provider
-        </option>
-        <div class='span4' id='select_tariff_frame'>
-          <select id='tariff_select'>
-            <option>
-              tariff
-            </option>
-          </select>
-        </div>
+      </select>
+    </div>
+    <div class='span4' id='select_provider_frame'>
+      <select id='provider_select'>
+        <% _.each(provider_data, function(provider) { 
+        	if (provider.provider_id === user_data.provider_id) { %>
+        		<option value="<%= provider.provider_id %>" selected><%= provider.title %></option>
+        	<% } else { %>
+        		<option value="<%= provider.provider_id %>"><%= provider.title %></option>
+        	<% } %>
+        <% }); %>
+      </select>
+    </div>
+    <div class='span4' id='select_tariff_frame'>
+      <select id='tariff_select'>
+        <% _.each(tariff_data, function(tariff) { 
+        	if (tariff.region_id === user_data.tariff_id) { %>
+        		<option value="<%= tariff.tariff_id %>" selected><%= tariff.tariff_label %></option>
+        	<% } else { %>
+        		<option value="<%= tariff.tariff_id %>"><%= tariff.tariff_label %></option>
+        	<% } %>
+        <% }); %>
       </select>
     </div>
   </div>
