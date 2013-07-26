@@ -4,6 +4,7 @@ express = require 'express'
 fs = require 'fs'
 http = require 'http'
 socket = require 'socket.io'
+_ = require 'underscore'
 
 database = require './custom_modules/database'
 calculator = require './custom_modules/calculator'
@@ -37,6 +38,12 @@ app.get '/', (request, response) ->
 		console.log view
 		response.end()
 
+app.get '/already_open', (request, response) ->
+	response.writeHead 200,
+			'Access-Control-Allow-Origin' : '*'
+	response.write "You have a page already open, please use only one instance at a time to prevent errors."
+	response.end()
+	
 app.get '/js/:folder1?/:folder2?/:file', (request, response) ->
 	if request.params.folder2
 		data = fs.readFileSync './js/'+request.params.folder1+'/'+request.params.folder2+'/'+request.params.file
@@ -77,8 +84,8 @@ app.get '/appliance_usage/fetch', (request, response) ->
 app.get '/views/fetch', (request, response) ->
 	view = request.query.view
 	switch view
-		when "realtime" then template = "realtime_view.html"
-		when "timeline" then template = "timeline_view.html"
+		when "timer" then template = "timer_view.html"
+		when "summary" then template = "summary_view.html"
 		when "models" then template = "model_views.html"
 		
 	fs.readFile "./views/"+template, (error, template) ->
@@ -176,17 +183,19 @@ app.get '/comparisons/generate', (request, response) ->
 				database.getUserData (user_id), (user_data) ->
 					database.getTariffData (user_data.region_id), (tariff_data) ->
 				
+						#console.log "user_id is "+user_id
+				
 						timer_data = calculator.calculateTerminatedUsage(timers)
 									
 						data =
 							timer_data : timer_data
 							end_point : end_point
 							tariff_data : tariff_data
-							user_data : user_data
+							user_data :  _.first user_data
 							reward_data : reward_data
 							appliance_data : appliance_data
 							
-						console.log data
+						#console.log data
 				
 						comparison_data = calculator.calculateComparisons (data)
 						response.write JSON.stringify comparison_data

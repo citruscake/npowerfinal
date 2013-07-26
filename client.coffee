@@ -1,7 +1,7 @@
 $ ->
 
-	timeline_view = null
-	realtime_view = null
+	summary_view = null
+	timer_view = null
 	applianceCollection = null 
 	applianceCollectionView = null
 	timerCollection = null
@@ -10,6 +10,18 @@ $ ->
 	comparisonCollectionView = null	
 	window.user = null
 	window.tariff = null
+	current_page = null
+	
+	in_use = $.cookie 'in_use'
+	if in_use == 'true'
+		window.location.href = "/already_open"
+	else
+		$.cookie 'in_use', 'true', 
+			expires : 7
+	
+	window.onbeforeunload = ->
+		$.removeCookie 'in_use'
+		return null
 	
 	#window.user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
 			
@@ -23,7 +35,8 @@ $ ->
 						user_id : window.user.get 'user_id'
 					success : (collection,response) ->
 						timerCollection.addDummyTimers applianceCollection.models
-						$('#realtime_view_link').trigger 'click'
+						$('#timer_view_link').trigger 'click'
+						current_page = "timer"
 					error : (h,response) ->	
 			error : (h,response) ->
 	
@@ -106,7 +119,7 @@ $ ->
 	calculateSummary = ->
 		timestamp = new Date().getTime()
 		data = 
-			user_id : window.user_id
+			user_id : window.user.get 'user_id'
 			timestamp : timestamp
 		$.get '/comparisons/generate', data, (response) ->
 			#console.log $.parseJSON response
@@ -119,12 +132,12 @@ $ ->
 
 	$('document').ready ->
 	
-		$('#realtime_view_link').on 'click' : (event) ->
-			$('#app_menu').children('li').eq(0).addClass 'active_page'
-			$('#app_menu').children('li').eq(1).removeClass 'active_page'
+		$('#timer_view_link').on 'click' : (event) ->
+			#$('#app_menu').children('li').eq(0).addClass 'active_page'
+			#$('#app_menu').children('li').eq(1).removeClass 'active_page'
 		
-			if $('#realtime_view_template').length == 0
-				$.get "/views/fetch", { view : 'realtime' }, (template) ->
+			if $('#timer_view_template').length == 0
+				$.get "/views/fetch", { view : 'timer' }, (template) ->
 					$('#app_templates').append template
 					$('#page_container').append $(template).html()
 
@@ -134,22 +147,28 @@ $ ->
 									
 					initialisePageCalculator()	
 			else
-				timeline_view = $('#timeline_view').detach()
-				$('#page_container').append realtime_view
-				return false
+				if current_page == "summary"
+					summary_view = $('#summary_view').detach()
+					$('#page_container').append timer_view
+				
+			current_page = "timer"	
+			return false
 	
-		$('#timeline_view_link').on 'click' : (event) ->
-			$('#app_menu').children('li').eq(1).addClass 'active_page'
-			$('#app_menu').children('li').eq(0).removeClass 'active_page'
-			if $('#timeline_view_template').length == 0
-				$.get "/views/fetch", { view : 'timeline' }, (template) ->
+		$('#summary_view_link').on 'click' : (event) ->
+			#$('#app_menu').children('li').eq(1).addClass 'active_page'
+			#$('#app_menu').children('li').eq(0).removeClass 'active_page'
+			if $('#summary_view_template').length == 0
+				$.get "/views/fetch", { view : 'summary' }, (template) ->
 					$('#app_templates').append template
-					realtime_view = $('#realtime_view').detach()
+					timer_view = $('#timer_view').detach()
 					$('#page_container').append $(template).html()
 			else
-				realtime_view = $('#realtime_view').detach()
-				$('#page_container').append timeline_view
+				if current_page == "timer"
+					timer_view = $('#timer_view').detach()
+					$('#page_container').append summary_view
+					
 			calculateSummary()
+			current_page = "summary"
 			return false
 	
 	$.get "/views/fetch", { view : 'models' }, (templates) ->
@@ -172,12 +191,13 @@ $ ->
 		
 		window.user = new UserModel()
 			
-		if typeof($.cookie 'user_id') != 'undefined'
+		if typeof($.cookie 'user_id') == 'undefined'
+			console.log "no cookie!1"
 			$.get "/users/generateId", (response) ->
 				user_id = $.parseJSON response
-				$.cookie 'user_id', user_id, 
+				cookie_data =
 					expires : 1
-					path : '/'	
+				$.cookie 'user_id', user_id, cookie_data
 				window.user = new UserModel
 					user_id : user_id
 				window.user.fetch
@@ -186,6 +206,7 @@ $ ->
 						initialiseTariffSelector()
 		else
 			user_id = $.cookie 'user_id'
+			alert "welcome back "+user_id
 			#window.user_id = user_id
 			$.cookie('user_id').expires = 1
 			window.user = new UserModel

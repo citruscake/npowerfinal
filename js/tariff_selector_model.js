@@ -96,10 +96,9 @@
         var tariff_data, tariff_id;
         tariff_data = this.model.get('tariff_data');
         tariff_id = window.user.get('tariff_id');
-        window.tariff = _.first(_.filter(tariff_data, function(tariff) {
+        return window.tariff = _.first(_.filter(tariff_data, function(tariff) {
           return tariff.tariff_id === tariff_id;
         }));
-        return $('#total_cost').html('&#163;' + window.tariff.unit_rate);
       },
       render: function(user_data) {
         var attributes;

@@ -1,8 +1,8 @@
 (function() {
   $(function() {
-    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, fetchModels, formatTimestamp, initialisePageCalculator, initialiseTariffSelector, realtime_view, timeline_view, timerCollection, timerCollectionView;
-    timeline_view = null;
-    realtime_view = null;
+    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, current_page, fetchModels, formatTimestamp, in_use, initialisePageCalculator, initialiseTariffSelector, summary_view, timerCollection, timerCollectionView, timer_view;
+    summary_view = null;
+    timer_view = null;
     applianceCollection = null;
     applianceCollectionView = null;
     timerCollection = null;
@@ -11,6 +11,19 @@
     comparisonCollectionView = null;
     window.user = null;
     window.tariff = null;
+    current_page = null;
+    in_use = $.cookie('in_use');
+    if (in_use === 'true') {
+      window.location.href = "/already_open";
+    } else {
+      $.cookie('in_use', 'true', {
+        expires: 7
+      });
+    }
+    window.onbeforeunload = function() {
+      $.removeCookie('in_use');
+      return null;
+    };
     fetchModels = function() {
       return applianceCollection.fetch({
         success: function(collection, response) {
@@ -21,7 +34,8 @@
             },
             success: function(collection, response) {
               timerCollection.addDummyTimers(applianceCollection.models);
-              return $('#realtime_view_link').trigger('click');
+              $('#timer_view_link').trigger('click');
+              return current_page = "timer";
             },
             error: function(h, response) {}
           });
@@ -116,7 +130,7 @@
       var data, timestamp;
       timestamp = new Date().getTime();
       data = {
-        user_id: window.user_id,
+        user_id: window.user.get('user_id'),
         timestamp: timestamp
       };
       return $.get('/comparisons/generate', data, function(response) {
@@ -129,13 +143,11 @@
       });
     };
     $('document').ready(function() {
-      $('#realtime_view_link').on({
+      $('#timer_view_link').on({
         'click': function(event) {
-          $('#app_menu').children('li').eq(0).addClass('active_page');
-          $('#app_menu').children('li').eq(1).removeClass('active_page');
-          if ($('#realtime_view_template').length === 0) {
-            return $.get("/views/fetch", {
-              view: 'realtime'
+          if ($('#timer_view_template').length === 0) {
+            $.get("/views/fetch", {
+              view: 'timer'
             }, function(template) {
               var appliances;
               $('#app_templates').append(template);
@@ -145,29 +157,33 @@
               return initialisePageCalculator();
             });
           } else {
-            timeline_view = $('#timeline_view').detach();
-            $('#page_container').append(realtime_view);
-            return false;
+            if (current_page === "summary") {
+              summary_view = $('#summary_view').detach();
+              $('#page_container').append(timer_view);
+            }
           }
+          current_page = "timer";
+          return false;
         }
       });
-      return $('#timeline_view_link').on({
+      return $('#summary_view_link').on({
         'click': function(event) {
-          $('#app_menu').children('li').eq(1).addClass('active_page');
-          $('#app_menu').children('li').eq(0).removeClass('active_page');
-          if ($('#timeline_view_template').length === 0) {
+          if ($('#summary_view_template').length === 0) {
             $.get("/views/fetch", {
-              view: 'timeline'
+              view: 'summary'
             }, function(template) {
               $('#app_templates').append(template);
-              realtime_view = $('#realtime_view').detach();
+              timer_view = $('#timer_view').detach();
               return $('#page_container').append($(template).html());
             });
           } else {
-            realtime_view = $('#realtime_view').detach();
-            $('#page_container').append(timeline_view);
+            if (current_page === "timer") {
+              timer_view = $('#timer_view').detach();
+              $('#page_container').append(summary_view);
+            }
           }
           calculateSummary();
+          current_page = "summary";
           return false;
         }
       });
@@ -191,14 +207,15 @@
         collection: timerCollection
       });
       window.user = new UserModel();
-      if (typeof ($.cookie('user_id')) !== 'undefined') {
+      if (typeof ($.cookie('user_id')) === 'undefined') {
+        console.log("no cookie!1");
         return $.get("/users/generateId", function(response) {
-          var user_id;
+          var cookie_data, user_id;
           user_id = $.parseJSON(response);
-          $.cookie('user_id', user_id, {
-            expires: 1,
-            path: '/'
-          });
+          cookie_data = {
+            expires: 1
+          };
+          $.cookie('user_id', user_id, cookie_data);
           window.user = new UserModel({
             user_id: user_id
           });
@@ -211,6 +228,7 @@
         });
       } else {
         user_id = $.cookie('user_id');
+        alert("welcome back " + user_id);
         $.cookie('user_id').expires = 1;
         window.user = new UserModel({
           user_id: user_id

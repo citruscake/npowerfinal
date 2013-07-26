@@ -85,7 +85,7 @@ window.initialiseTariffSelectorModel = ->
 			window.tariff = _.first _.filter tariff_data, (tariff) ->
 				#console.log tariff.tariff_id
 				return tariff.tariff_id == tariff_id
-			$('#total_cost').html '&#163;'+window.tariff.unit_rate
+			#$('#total_cost').html '&#163;'+window.tariff.unit_rate
 	
 		render : (user_data) ->
 			this.template = this['template']

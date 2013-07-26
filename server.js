@@ -1,5 +1,5 @@
 (function() {
-  var app, calculator, config, database, env, express, fs, http, io, server, socket, user_id_generator;
+  var app, calculator, config, database, env, express, fs, http, io, server, socket, user_id_generator, _;
 
   express = require('express');
 
@@ -8,6 +8,8 @@
   http = require('http');
 
   socket = require('socket.io');
+
+  _ = require('underscore');
 
   database = require('./custom_modules/database');
 
@@ -44,6 +46,14 @@
       console.log(view);
       return response.end();
     });
+  });
+
+  app.get('/already_open', function(request, response) {
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*'
+    });
+    response.write("You have a page already open, please use only one instance at a time to prevent errors.");
+    return response.end();
   });
 
   app.get('/js/:folder1?/:folder2?/:file', function(request, response) {
@@ -98,11 +108,11 @@
     var template, view;
     view = request.query.view;
     switch (view) {
-      case "realtime":
-        template = "realtime_view.html";
+      case "timer":
+        template = "timer_view.html";
         break;
-      case "timeline":
-        template = "timeline_view.html";
+      case "summary":
+        template = "summary_view.html";
         break;
       case "models":
         template = "model_views.html";
@@ -228,11 +238,10 @@
                 timer_data: timer_data,
                 end_point: end_point,
                 tariff_data: tariff_data,
-                user_data: user_data,
+                user_data: _.first(user_data),
                 reward_data: reward_data,
                 appliance_data: appliance_data
               };
-              console.log(data);
               comparison_data = calculator.calculateComparisons(data);
               response.write(JSON.stringify(comparison_data));
               return response.end();

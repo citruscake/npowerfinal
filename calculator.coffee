@@ -46,9 +46,7 @@ exports.calculateComparisons = (data) ->
 	user_data = data.user_data
 	reward_data = data.reward_data
 	appliance_data = data.appliance_data
-	
-	#console.log timer_data
-	
+
 	appliance_spend = Array()
 	
 	for timer in timer_data
@@ -61,37 +59,35 @@ exports.calculateComparisons = (data) ->
 		appliance = _.first _.filter appliance_data, (appliance) -> 
 			appliance.appliance_id == appliance_id
 		wattage = appliance.wattage
-		
-		# take into account wattage!
-		
+
 		for tariff in tariff_data
 			tariff_id = tariff.tariff_id
-			#if 	appliance_spend[tariff_id] == undefined
-			#	appliance_spend[tariff_id] = new Array()
 			appliance_spend.push
 				tariff_id : tariff_id
 				appliance_id : appliance_id
-				total_spend : (total_timestamp / (60*60*1000)) * parseFloat(tariff.unit_rate) * parseFloat(wattage)
-			#appliance_spend[tariff_id][appliance_id] = ((total_timestamp / (60*60*1000)) * (float) tariff.unit_rate)
+				total_spend : ((total_timestamp / (60*60*1000)) * parseFloat(tariff.unit_rate) * parseFloat(wattage)) / 1000
 
-		#console.log appliance.wattage
-			
 	cheapest_tariffs = new Array()
 	user_spend = ""
+	
+	console.log "am i here??"
+	#console.log appliance_spend
 	
 	for tariff in tariff_data
 		tariff_id = tariff.tariff_id
 		tariff_appliance_spend = _.filter appliance_spend, (spend) ->
 			spend.tariff_id == tariff_id
-		#console.log "appliance_spend "+tariff_id
-		#console.log tariff_appliance_spend
+		console.log "tariff_appliance_spend"
+		console.log tariff_appliance_spend
 		tariff_spend = _.reduce tariff_appliance_spend, (memo, spend) ->
 			memo += spend.total_spend
 		,0
-		#console.log "tariff_spend "+tariff_spend
+
 		tariff_spend += parseFloat tariff.standing_charge
-		console.log "tariff_spend "+tariff_id+", "+tariff_spend
+		#console.log tariff_id
+		#console.log user_data.tariff_id
 		if tariff_id == user_data.tariff_id
+			#console.log "setting user_spend"
 			user_spend =	
 				tariff_id : tariff_id
 				tariff_spend : tariff_spend
@@ -108,10 +104,7 @@ exports.calculateComparisons = (data) ->
 					cheapest_tariffs.push 
 						tariff_id : tariff_id
 						tariff_spend : tariff_spend
-	
-	#for tariff in cheapest_tariffs
-	#	tariff_id = tariff.tariff_id
-	
+
 	console.log cheapest_tariffs
 	
 	usage_fractions = Array()

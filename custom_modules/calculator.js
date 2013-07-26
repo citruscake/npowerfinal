@@ -73,23 +73,25 @@
         appliance_spend.push({
           tariff_id: tariff_id,
           appliance_id: appliance_id,
-          total_spend: (total_timestamp / (60 * 60 * 1000)) * parseFloat(tariff.unit_rate) * parseFloat(wattage)
+          total_spend: ((total_timestamp / (60 * 60 * 1000)) * parseFloat(tariff.unit_rate) * parseFloat(wattage)) / 1000
         });
       }
     }
     cheapest_tariffs = new Array();
     user_spend = "";
+    console.log("am i here??");
     for (_k = 0, _len2 = tariff_data.length; _k < _len2; _k++) {
       tariff = tariff_data[_k];
       tariff_id = tariff.tariff_id;
       tariff_appliance_spend = _.filter(appliance_spend, function(spend) {
         return spend.tariff_id === tariff_id;
       });
+      console.log("tariff_appliance_spend");
+      console.log(tariff_appliance_spend);
       tariff_spend = _.reduce(tariff_appliance_spend, function(memo, spend) {
         return memo += spend.total_spend;
       }, 0);
       tariff_spend += parseFloat(tariff.standing_charge);
-      console.log("tariff_spend " + tariff_id + ", " + tariff_spend);
       if (tariff_id === user_data.tariff_id) {
         user_spend = {
           tariff_id: tariff_id,

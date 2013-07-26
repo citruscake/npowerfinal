@@ -38,7 +38,7 @@
   border-style: solid;
 }
 
-#realtime_view {
+#timer_view {
   padding-left: 40px;
 }
 
@@ -94,7 +94,7 @@
   margin-left: -13px;
 }
 
-#timeline_view .row-fluid .span12 {
+#summary_view .row-fluid .span12 {
   width: 95%;
   margin-left: 2.5%;
 }
