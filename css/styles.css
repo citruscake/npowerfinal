@@ -1,7 +1,54 @@
-.button_container {
-  background-color: #dddddd;
-  height: 100px;
-  width: 150px;
+.timer-container {
+  margin-left: 0px;
+  padding-top: 10px;
+}
+.timer-container .row-fluid .span4 {
+  width: 70px;
+}
+.timer-container .row-fluid .span4 .button-container {
+  height: 50px;
+  width: 50px;
+  margin-left: 10px;
+  border-radius: 2px;
+}
+.timer-container .row-fluid .span4 .button-container .button {
+  height: 100%;
+  width: 100%;
+  background-color: #cccccc;
+  border-radius: 50%;
+  border-color: #bbbbbb;
+  border-width: 0px;
+  border-style: solid;
+  cursor: pointer;
+  position: relative;
+  top: -5px;
+  z-index: 300;
+}
+.timer-container .row-fluid .span4 .button-container .button-shadow {
+  height: 100%;
+  width: 100%;
+  background-color: #333333;
+  border-radius: 50%;
+  top: -100%;
+  position: relative;
+}
+.timer-container .row-fluid .span8 {
+  margin-left: 0px;
+}
+.timer-container .row-fluid .span8 .row-fluid .span12 .title-container {
+  position: relative;
+  width: 200px;
+}
+.timer-container .row-fluid .span8 .row-fluid .span12 .title-container h5 {
+  margin: 0px;
+  font-family: sans-serif;
+  letter-spacing: 1 px;
+  font-size: 18px;
+  line-height: 25px;
+  color: #333333;
+}
+.timer-container .row-fluid .span8 .row-fluid .span12 {
+  position: relative;
 }
 
 .timeline_container {
@@ -38,8 +85,8 @@
   border-style: solid;
 }
 
-#timer_view {
-  padding-left: 40px;
+#timer_gallery {
+  margin-left: 35px;
 }
 
 #timer_gallery ul {
@@ -49,18 +96,10 @@
 
 #timer_gallery ul li {
   list-style-type: none;
-  width: 40%;
-  margin-right: 50px;
-  margin-left: 30px;
-}
-
-.timer_container {
-  height: 70px;
-  background-color: #cccccc;
-  border-radius: 3px 0px 0px 3px;
-  border-color: #bbbbbb;
-  border-width: 0px;
-  border-style: solid;
+  margin-top: 0px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  padding: 0px;
 }
 
 .timer_icon_container {
@@ -117,31 +156,42 @@ html {
 
 body {
   height: 100%;
-  background-color: #eeeeee;
+  background-color: #333333;
+  background-image: url("/img/wavegrid.png");
+  background-attachment: fixed;
+}
+
+::selection {
+  color: #dddddd;
+  background-color: black;
 }
 
 #app_templates {
   display: none;
 }
 
+#app_container {
+  padding: 0px 8px 0px 8px;
+  background-color: #333333;
+  background-image: url("/img/subtle_carbon.png");
+}
 #app_container #app_header {
-  height: 120px;
-  background-color: #dddddd;
-  border-width: 0px 0px 2px 0px;
-  border-color: #cccccc;
-  border-style: solid;
+  background-color: #111111;
+  border-radius: 0px 0px 3px 3px;
+  padding-bottom: 20px;
 }
 #app_container #app_header #app_nav {
-  min-width: 660px;
+  min-width: 620px;
 }
 #app_container #app_header #app_nav .row-fluid .span5 #brand-frame {
-  background-color: #cccccc;
-  width: 190px;
-  height: 120px;
+  background-color: #181818;
+  width: 200px;
+  height: 100px;
   margin-left: 30px;
+  margin-top: 25px;
+  border-radius: 1px;
 }
 #app_container #app_header #app_nav .row-fluid .span5 #brand-frame .brand {
-  font-family: poiret-one, sans-serif;
   font-size: 38px;
   line-height: 40px;
   color: #eeeeee;
@@ -150,13 +200,14 @@ body {
   text-shadow: 1px 1px 2px #cccccc;
   filter: dropshadow(color=#cccccc, offx=1, offy=1);
   padding-top: 20px;
+  margin-left: 20px;
 }
 #app_container #app_header #app_nav .row-fluid .span7 .navbar {
   height: 120px;
   margin-bottom: 0px;
 }
 #app_container #app_header #app_nav .row-fluid .span7 .navbar .navbar-inner {
-  height: 120px;
+  height: 125px;
   background-color: transparent;
   background-image: none;
   position: absolute;
@@ -164,72 +215,104 @@ body {
   box-shadow: none;
 }
 #app_container #app_header #app_nav .row-fluid .span7 .navbar .navbar-inner ul#app_menu {
-  margin-left: 5px;
+  margin-left: -18px;
   bottom: 0px;
   position: absolute;
   width: 400px;
 }
 #app_container #app_header #app_nav .row-fluid .span7 .navbar .navbar-inner ul#app_menu li {
   font-family: poiret-one, sans-serif;
-  font-size: 30px;
-  color: #eeeeee;
-  background-color: white;
-  padding: 10px 5px 10px 5px;
-  margin-right: 5px;
-  border-radius: 3px 3px 0px 0px;
+  font-size: 22px;
+  color: #141414;
+  background-color: #1b1b1b;
+  padding: 15px 5px 15px 5px;
+  margin-right: 10px;
+  border-radius: 0px;
+  cursor: pointer;
 }
-#app_container #app_header #app_tariff_data .row-fluid {
-  height: 70px;
+#app_container #app_header #app_nav .row-fluid .span7 .navbar .navbar-inner ul#app_menu li a {
+  text-shadow: none;
+  color: #dddddd;
+  font-family: Fredoka One, sans-serif;
+}
+#app_container #app_header #app_nav .row-fluid .span7 .navbar .navbar-inner ul#app_menu li:hover {
+  background-color: #222222;
+}
+#app_container #app_header #app_tariff_data {
+  min-width: 432px;
+  height: 85px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #total_cost_frame {
   height: 50px;
   width: 350px;
-  background-color: #cccccc;
   margin-top: 10px;
   margin-right: 10px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #total_cost_frame #total_cost {
-  height: 40px;
-  background-color: #aaaaaa;
-  font-size: 40px;
-  font-family: poiret-one, sans-serif;
-  line-height: 30px;
+  height: 60px;
+  font-size: 60px;
+  font-family: Fredoka One, sans-serif;
+  line-height: 60px;
   padding: 10px 0px 0px 0px;
   margin-right: 5px;
+  color: #eeeeee;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame {
+  margin-top: 25px;
+  min-width: 432px;
+  margin-right: 10px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_region_frame {
-  margin-left: 3px;
+  margin-left: 5px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_region_frame #region_select {
   width: 100%;
-  font-family: poiret-one, sans-serif;
+  font-family: Fredoka One, sans-serif;
   font-size: 15px;
-  color: #666666;
+  color: #dddddd;
   line-height: 40px;
   height: 40px;
   margin-left: 0px;
+  padding: 5px;
+  background-color: #444444;
+  border: none;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_region_frame #region_select:focus {
+  outline: none;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_provider_frame {
-  margin-left: 3px;
+  margin-left: 5px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_provider_frame #provider_select {
   width: 100%;
-  font-family: poiret-one, sans-serif;
+  font-family: Fredoka One, sans-serif;
   font-size: 15px;
-  color: #666666;
+  color: #dddddd;
   line-height: 40px;
   height: 40px;
   margin-left: 0px;
+  padding: 5px;
+  background-color: #444444;
+  border: none;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_provider_frame #provider_select:focus {
+  outline: none;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_tariff_frame {
-  margin-left: 3px;
+  margin-left: 5px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_tariff_frame #tariff_select {
   width: 100%;
-  font-family: poiret-one, sans-serif;
+  font-family: Fredoka One, sans-serif;
   font-size: 15px;
-  color: #666666;
+  color: #dddddd;
   line-height: 40px;
   height: 40px;
   margin-left: 0px;
+  padding: 5px;
+  background-color: #444444;
+  border: none;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_tariff_frame #tariff_select:focus {
+  outline: none;
 }

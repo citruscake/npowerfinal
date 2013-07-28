@@ -1,40 +1,56 @@
 @mixin select
 	width : 100%
-	font-family : poiret-one, sans-serif
+	font-family : Fredoka One, sans-serif
 	font-size : 15px
-	color : #666666
+	color : #dddddd
 	line-height : 40px
 	height : 40px
 	margin-left: 0px
-	
+	padding : 5px
+	background-color : #444444
+	border : none
+
 html
 	height : 100%
 	
 body
 	height : 100%
-	background-color : #eeeeee
+	background-color : #333333
+	//background-image : url('/img/binding_dark.png')
+	background-image : url('/img/wavegrid.png')
+	//background-size : 100% 100%
+	background-attachment : fixed
 
+::selection 
+	color : #dddddd
+	background-color : #000000
+	
 #app_templates
 	display : none
 	
 #app_container
+	padding : 0px 8px 0px 8px
+	background-color : #333333
+	background-image : url('/img/subtle_carbon.png')
 	#app_header
-		height : 120px
-		background-color : #dddddd
-		border-width : 0px 0px 2px 0px
-		border-color : #cccccc
-		border-style : solid
+		//height : 145px
+		background-color : #111111
+		border-radius : 0px 0px 3px 3px
+		//background-image : url('/img/subtle_carbon.png')
+		padding-bottom : 20px
 		#app_nav
-			min-width : 660px
+			min-width : 620px
 			.row-fluid
 				.span5
 					#brand-frame
-						background-color : #cccccc
-						width : 190px
-						height : 120px
+						background-color : #181818
+						width : 200px
+						height : 100px
 						margin-left : 30px
+						margin-top : 25px
+						border-radius : 1px
 						.brand
-							font-family : poiret-one, sans-serif
+							//font-family : poiret-one, sans-serif
 							//font-family : Cinzel, sans-serif
 							font-size : 38px
 							line-height : 40px
@@ -44,60 +60,80 @@ body
 							text-shadow: 1px 1px 2px #cccccc
 							filter: dropshadow(color=#cccccc, offx=1, offy=1)
 							padding-top : 20px
+							margin-left: 20px
 				.span7
 					.navbar
 						height : 120px
 						margin-bottom : 0px
 						.navbar-inner
-							height : 120px
+							height : 125px
 							background-color : transparent
 							background-image : none
 							position : absolute
 							border : none
 							box-shadow : none
 							ul#app_menu
-								margin-left : 5px
+								margin-left: -18px
 								bottom : 0px
 								position : absolute
 								width : 400px
 								li
 									font-family : poiret-one, sans-serif
-									font-size : 30px
-									color : #eeeeee
-									background-color : #ffffff
-									padding : 10px 5px 10px 5px
-									margin-right : 5px
-									border-radius : 3px 3px 0px 0px
+									font-size : 22px
+									color : #141414
+									background-color : rgb(27, 27, 27)
+									padding : 15px 5px 15px 5px
+									margin-right : 10px
+									border-radius : 0px
+									cursor : pointer
+									a
+										text-shadow : none
+										color : #dddddd
+										font-family : Fredoka One, sans-serif
+									&:hover
+										background-color : #222222
 		#app_tariff_data
+			min-width: 432px
+			height : 85px
 			.row-fluid
-				height : 70px
 				#total_cost_frame
 					height : 50px
 					width : 350px
-					background-color : #cccccc
+					//background-color : #cccccc
 					margin-top : 10px
 					margin-right : 10px
 					#total_cost
-						height : 40px
+						height : 60px
 						//width : 250px
-						background-color : #aaaaaa
-						font-size : 40px
-						font-family : poiret-one, sans-serif
-						line-height : 30px
+						//background-color : #aaaaaa
+						font-size : 60px
+						//font-family : poiret-one, sans-serif
+						font-family : Fredoka One, sans-serif
+						line-height : 60px
 						padding : 10px 0px 0px 0px
 						margin-right : 5px
+						color : #eeeeee
 			.row-fluid
 				#tariff_options_frame
+					margin-top: 25px
+					min-width: 432px
+					margin-right : 10px
 					.row-fluid
 						#select_region_frame
-							margin-left : 3px
+							margin-left : 5px
 							#region_select
 								@include select
+								&:focus
+									outline : none
 						#select_provider_frame
-							margin-left : 3px
+							margin-left : 5px
 							#provider_select
 								@include select
+								&:focus
+									outline : none
 						#select_tariff_frame
-							margin-left : 3px
+							margin-left : 5px
 							#tariff_select
 								@include select
+								&:focus
+									outline : none

@@ -7,12 +7,17 @@
 		%script{:type => "text/javascript",
 				:src => "http://code.jquery.com/ui/1.10.3/jquery-ui.js"}
 		%script{:type => "text/javascript",
-				:src => "http://use.edgefonts.net/poiret-one.js"}
+				:src => "http://use.edgefonts.net/poiret-one;ultra;passion-one.js"}
 		%link{:rel => "stylesheet",
 				:type => "text/css",
 				:href => "http://fonts.googleapis.com/css?family=Cinzel"}
+		%link{:rel => "stylesheet",
+				:type => "text/css",
+				:href => "http://fonts.googleapis.com/css?family=Fredoka+One"}
 		%script{:type => "text/javascript",
 				:src => "/js/libs/underscore.js"}
+		%script{:type => "text/javascript",		
+				:src => "/js/libs/jquery-animate-shadow-min.js"}
 		%script{:type => "text/javascript",
 				:src => "/js/libs/backbone.js"}
 		%script{:type => "text/javascript",
@@ -50,9 +55,7 @@
 						.span5
 							#brand-frame
 								.brand
-									24 Hour
-									%br
-									Challenge
+									%img{:src => "/img/titleimage.png"}
 						.span7
 							.navbar
 								.navbar-inner
@@ -65,7 +68,7 @@
 											%a{:href => "#",
 											:id => "summary_view_link"}
 												My savings
-				#app_tariff_data.span6
+				#app_tariff_data.span4.pull-right
 					.row-fluid
 						#total_cost_frame.span8.pull-right
 							#total_cost.pull-right

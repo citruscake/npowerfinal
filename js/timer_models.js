@@ -16,7 +16,7 @@
       tagName: 'li',
       template1: _.template($('#app_timer').html()),
       events: {
-        'click': 'timerToggle'
+        'click .button': 'timerToggle'
       },
       timerToggle: function() {
         var appliance_id, data, is_active, start_timestamp, timer, timestamp, total_timestamp;
@@ -33,6 +33,7 @@
           this.model.set('start_timestamp', timestamp);
         }
         appliance_id = this.model.get('appliance_id');
+        this.animatePress(appliance_id, is_active, 200);
         data = {
           appliance_id: appliance_id,
           is_active: this.model.get('is_active'),
@@ -42,24 +43,47 @@
         timer = this;
         return $.post('/timer/storeTimestamp', data, function(response) {
           response = JSON.parse(response);
+          console.log("IS_ACTIVE " + response.is_active);
           timer.model.set('is_active', response.is_active);
-          console.log("is_Active " + response.is_active);
-          return timer.animate(appliance_id, response.is_active);
+          return timer.animateColor(appliance_id, response.is_active, 200);
         });
       },
-      animate: function(appliance_id, is_active) {
+      animatePress: function(appliance_id, is_active, timeframe) {
+        var button;
+        button = $('#' + appliance_id + '.button');
+        if (is_active === 1) {
+          return button.animate({
+            'top': '-5px'
+          }, timeframe);
+        } else if (is_active === 0) {
+          return button.animate({
+            'top': '-3px'
+          }, timeframe);
+        }
+      },
+      animateColor: function(appliance_id, is_active, timeframe) {
+        var button, name;
+        button = $('#' + appliance_id + '.button');
+        name = $('#' + appliance_id + '.name');
+        console.log(button);
         if (is_active === 0) {
-          return $(this.el).animate({
-            'background-color': '#eeeeee'
-          }, 1000);
+          button.animate({
+            'background-color': '#666666'
+          }, 0);
+          return name.delay(200).animate({
+            'color': '#333333'
+          }, 0);
         } else if (is_active === 1) {
-          return $(this.el).animate({
-            'background-color': '#cccccc'
-          }, 1000);
+          button.animate({
+            'background-color': 'rgb(34, 220, 255)'
+          }, timeframe);
+          return name.delay(200).animate({
+            'color': '#eeeeee'
+          }, 0);
         }
       },
       render: function(appliance) {
-        var attributes;
+        var appliance_id, attributes, is_active;
         this.template = this['template1'];
         attributes = $.extend(this.model.toJSON(), appliance.toJSON());
         this.$el.html(this.template(attributes));
@@ -68,6 +92,15 @@
         $(this.el).addClass('thumbnail');
         $(this.el).attr('id', appliance.get('appliance_id'));
         $(this.el).find('.timer-display').attr('id', appliance.get('appliance_id'));
+        appliance_id = appliance.get('appliance_id');
+        is_active = this.model.get('is_active');
+        if (is_active === 0) {
+          $(this.el).find('#' + appliance_id + '.button').css('background-color', '#666666');
+        } else {
+          $(this.el).find('#' + appliance_id + '.button').css('background-color', 'rgb(34, 220, 255)');
+          $(this.el).find('#' + appliance_id + '.button').css('top', '-3px');
+          $(this.el).find('#' + appliance_id + '.name').css('color', '#eeeeee');
+        }
         return this;
       }
     });

@@ -13,7 +13,7 @@ window.initialiseTimerModels = ->
 		tagName : 'li'
 		template1 : _.template $('#app_timer').html()
 		events : 
-			'click' : 'timerToggle'
+			'click .button' : 'timerToggle'
 		timerToggle : ->
 			is_active = this.model.get 'is_active'
 			if is_active == 1
@@ -29,6 +29,8 @@ window.initialiseTimerModels = ->
 			
 			appliance_id = this.model.get 'appliance_id' #
 			
+			this.animatePress appliance_id, is_active, 200
+			
 			data = 
 				appliance_id : appliance_id
 				is_active : this.model.get 'is_active'
@@ -38,19 +40,45 @@ window.initialiseTimerModels = ->
 			
 			$.post '/timer/storeTimestamp', data, (response) ->
 				response = JSON.parse response
+				console.log "IS_ACTIVE "+response.is_active
 				timer.model.set 'is_active', response.is_active
-				console.log "is_Active "+response.is_active
-				timer.animate appliance_id, response.is_active
+				timer.animateColor appliance_id, response.is_active, 200
 
-		animate : (appliance_id, is_active) ->
-			if is_active == 0 #will become 1
-				$(this.el).animate
-					'background-color' : '#eeeeee'
-				,1000			
-			else if is_active == 1 #will become 0
-				$(this.el).animate
-					'background-color' : '#cccccc'
-				,1000
+		animatePress : (appliance_id, is_active, timeframe) ->
+			button = $('#'+appliance_id+'.button')
+			if is_active == 1
+				button.animate
+					#'box-shadow' : '0px 15px 0px #888888'
+					#'boxShadow' : '0px 6px 0px #888888'
+					'top' : '-5px'
+					#boxShadow: '0 0 30px #44f'
+				,timeframe
+			else if is_active == 0
+				button.animate
+					#'box-shadow' : '0px 2px 0px #777777'
+					#'boxShadow' : '0px 3px 0px #777777'
+					'top' : '-3px'
+					#boxShadow: '0 0 30px #44f'
+				,timeframe
+				
+		animateColor : (appliance_id, is_active, timeframe) ->
+			button = $('#'+appliance_id+'.button')
+			name = $('#'+appliance_id+'.name')
+			console.log button
+			if is_active == 0
+				button.animate
+					'background-color' : '#666666'
+				,0
+				name.delay(200).animate
+					'color' : '#333333'
+				,0
+			else if is_active == 1
+				button.animate
+					'background-color' : 'rgb(34, 220, 255)'
+				,timeframe
+				name.delay(200).animate
+					'color' : '#eeeeee'
+				,0
 				
 		render : (appliance) ->
 
@@ -76,7 +104,15 @@ window.initialiseTimerModels = ->
 			#	$(this.el).css 'background-color', '#cccccc'
 			#else 
 			#	$(this.el).css 'background-color', '#333333'
-
+			appliance_id = appliance.get 'appliance_id'
+			is_active = this.model.get 'is_active'
+			
+			if is_active == 0
+				$(this.el).find('#'+appliance_id+'.button').css 'background-color', '#666666'
+			else
+				$(this.el).find('#'+appliance_id+'.button').css 'background-color', 'rgb(34, 220, 255)'
+				$(this.el).find('#'+appliance_id+'.button').css 'top', '-3px'
+				$(this.el).find('#'+appliance_id+'.name').css 'color', '#eeeeee'
 			return this
 	
 	window.TimerCollectionView = Backbone.View.extend
@@ -112,7 +148,7 @@ window.initialiseTimerModels = ->
 			#		start_timestamp : ""
 			#	timerView = new TimerView
 			#		model : timerModel
-					
+			
 			this.$el.append timerView.render(appliance).el
 
 	window.TimerCollection = Backbone.Collection.extend 

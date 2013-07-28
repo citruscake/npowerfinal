@@ -5,25 +5,44 @@
 			
 %script{:type => "text/template", :id => "app_timer"}
 	.row-fluid
-		.timer-container
-			.row-fluid
-				.span4
-					.button-container
-						//<img src="./img/powersymbol.png" style="width:40%;top:12px;left:15px;position:relative"/>
-						:plain
-							<div class="button" id="<%= appliance_id %>">
-							</div>
-							<div class="button-shadow"></div>
-				.span8
-					.row-fluid
-						.span12
-							.title-container
-								%h5
-									:plain
-										<div class="name" id="<%= appliance_id %>"><%= name %></div>
-					.row-fluid
-						
-			
+		.span11
+			.timer_container
+				.row-fluid
+					.span2
+						.timer_icon_container.img-circle
+							%h5
+								<%= name %>
+					.span8
+						.timeline_container
+							.row-fluid
+								.span12
+									.marker_frame{:style=>"margin-left:0px;"}
+										%h5
+											0
+									.marker_frame{:style=>"margin-left:95px;"}
+										%h5
+											6
+									.marker_frame{:style=>"margin-left:191px;"}
+										%h5
+											12
+									.marker_frame{:style=>"margin-left:286px;"}
+										%h5
+											18
+									.marker_frame{:style=>"margin-left:382px;"}
+										%h5
+											24
+							.row-fluid
+								.span12
+									.timeline_frame
+										.timeline_block
+					.span2
+		.span1
+			.arrow_box
+	.row-fluid
+		:plain
+			<div id='<%= appliance_id %>' class='time-display span6'></div>
+			<div id='<%= appliance_id %>' class='cost-display span6'></div>
+		
 %script{:type => "text/template", :id => "comparison_frame"}
 	.row-fluid
 		To save &#163;<%= daily_saving %>a day / &#163;<%= yearly_saving %> a year...

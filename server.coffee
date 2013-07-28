@@ -80,6 +80,14 @@ app.get '/appliance_usage/fetch', (request, response) ->
 			'Access-Control-Allow-Origin' : '*'
 		response.write JSON.stringify(appliance_usage)
 		response.end()
+
+app.get '/img/:file', (request, response) ->
+	data = fs.readFileSync './img/'+request.params.file
+	response.writeHead 200,
+		'Access-Control-Allow-Origin' : '*',
+		'Content-type' : 'image/png'
+	response.write data
+	response.end()
 		
 app.get '/views/fetch', (request, response) ->
 	view = request.query.view

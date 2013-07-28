@@ -228,7 +228,6 @@
         });
       } else {
         user_id = $.cookie('user_id');
-        alert("welcome back " + user_id);
         $.cookie('user_id').expires = 1;
         window.user = new UserModel({
           user_id: user_id

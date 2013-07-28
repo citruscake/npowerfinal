@@ -144,7 +144,7 @@ $ ->
 					appliances = applianceCollection.models
 
 					$('#timer_gallery').html timerCollectionView.render(appliances).el
-									
+
 					initialisePageCalculator()	
 			else
 				if current_page == "summary"
@@ -206,7 +206,7 @@ $ ->
 						initialiseTariffSelector()
 		else
 			user_id = $.cookie 'user_id'
-			alert "welcome back "+user_id
+			#alert "welcome back "+user_id
 			#window.user_id = user_id
 			$.cookie('user_id').expires = 1
 			window.user = new UserModel

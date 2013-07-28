@@ -104,6 +104,17 @@
     });
   });
 
+  app.get('/img/:file', function(request, response) {
+    var data;
+    data = fs.readFileSync('./img/' + request.params.file);
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Content-type': 'image/png'
+    });
+    response.write(data);
+    return response.end();
+  });
+
   app.get('/views/fetch', function(request, response) {
     var template, view;
     view = request.query.view;
