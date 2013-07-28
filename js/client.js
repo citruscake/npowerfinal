@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, current_page, fetchModels, formatTimestamp, in_use, initialisePageCalculator, initialiseTariffSelector, summary_view, timerCollection, timerCollectionView, timer_view;
+    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, current_page, fetchModels, in_use, initialiseInfoFrameCloseFunctionality, initialisePageCalculator, initialiseTariffSelector, summary_view, timerCollection, timerCollectionView, timer_view;
     summary_view = null;
     timer_view = null;
     applianceCollection = null;
@@ -35,13 +35,27 @@
             success: function(collection, response) {
               timerCollection.addDummyTimers(applianceCollection.models);
               $('#timer_view_link').trigger('click');
-              return current_page = "timer";
+              current_page = "timer";
+              return initialiseInfoFrameCloseFunctionality();
             },
             error: function(h, response) {}
           });
         },
         error: function(h, response) {}
       });
+    };
+    initialiseInfoFrameCloseFunctionality = function() {
+      $('#info_frame_close_link').on({
+        'click': function(event) {
+          return $('#info_frame_container').animate({
+            opacity: 0
+          }, 200, 'easeOutSine', function() {
+            $('#info_frame_container').css('top', '-1000px');
+            return $('body').css("overflow", "visible");
+          });
+        }
+      });
+      return false;
     };
     initialisePageCalculator = function() {
       var appliance, appliance_id, formatted_time, running_cost, timer, total_timestamp, unit_rate, updateTimer, wattage, _i, _len, _ref;
@@ -85,7 +99,8 @@
           total_cost += running_cost;
           $('#' + timer.get('appliance_id') + '.cost-display').html(running_cost);
         }
-        return $('#total_cost').html(total_cost);
+        $('#total_cost').html(formatCurrency(total_cost));
+        return console.log(total_cost);
       };
       return $.timer(updateTimer, 200, true);
     };
@@ -103,29 +118,6 @@
         }
       });
     };
-    formatTimestamp = function(timestamp) {
-      var formatted_hours, formatted_milliseconds, formatted_minutes, formatted_seconds, formatted_time, time;
-      time = new Date(timestamp);
-      formatted_hours = String(time.getHours());
-      formatted_minutes = String(time.getMinutes());
-      formatted_seconds = String(time.getSeconds());
-      formatted_milliseconds = String(time.getMilliseconds());
-      if (formatted_hours.length < 2) {
-        formatted_hours = "0" + formatted_hours;
-      }
-      if (formatted_minutes.length < 2) {
-        formatted_minutes = "0" + formatted_minutes;
-      }
-      if (formatted_seconds.length < 2) {
-        formatted_seconds = "0" + formatted_seconds;
-      }
-      if (formatted_milliseconds.length < 2) {
-        formatted_milliseconds = "00" + formatted_milliseconds;
-      } else if (formatted_milliseconds.length < 3) {
-        formatted_milliseconds = "0" + formatted_milliseconds;
-      }
-      return formatted_time = formatted_hours + ":" + formatted_minutes + ":" + formatted_seconds + ":" + formatted_milliseconds;
-    };
     calculateSummary = function() {
       var data, timestamp;
       timestamp = new Date().getTime();
@@ -138,8 +130,7 @@
         comparisonCollectionView = new ComparisonCollectionView({
           collection: comparisonCollection
         });
-        console.log(comparisonCollection.toJSON());
-        return $('#savings').html(comparisonCollectionView.render().el);
+        return $('#comparisons').html(comparisonCollectionView.render().el);
       });
     };
     $('document').ready(function() {
@@ -166,7 +157,7 @@
           return false;
         }
       });
-      return $('#summary_view_link').on({
+      $('#summary_view_link').on({
         'click': function(event) {
           if ($('#summary_view_template').length === 0) {
             $.get("/views/fetch", {
@@ -187,12 +178,23 @@
           return false;
         }
       });
+      return $('#info_frame_link').on({
+        'click': function(event) {
+          $('#info_frame_container').css('top', '0px');
+          $('body').css("overflow", "hidden");
+          return $('#info_frame_container').animate({
+            opacity: 1
+          }, 200, 'easeOutSine');
+        }
+      });
     });
     return $.get("/views/fetch", {
       view: 'models'
     }, function(templates) {
       var user_id;
       $('#app_templates').append(templates);
+      $('#app_container').append($('#info_frame_template').html());
+      $('#info_frame_container').css('top', '-1000px');
       initialiseApplianceModels();
       initialiseTimerModels();
       initialiseComparisonModels();
@@ -208,7 +210,6 @@
       });
       window.user = new UserModel();
       if (typeof ($.cookie('user_id')) === 'undefined') {
-        console.log("no cookie!1");
         return $.get("/users/generateId", function(response) {
           var cookie_data, user_id;
           user_id = $.parseJSON(response);

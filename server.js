@@ -84,6 +84,16 @@
     return response.end();
   });
 
+  app.get('/fonts/:file', function(request, response) {
+    var data;
+    data = fs.readFileSync('./fonts/' + request.params.file);
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*'
+    });
+    response.write(data);
+    return response.end();
+  });
+
   app.get('/appliances/fetch', function(request, response) {
     return database.getAppliances(function(appliances) {
       response.writeHead(200, {

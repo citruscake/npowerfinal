@@ -64,6 +64,13 @@ app.get '/css/:file', (request, response) ->
 		'Content-type' : 'text/css'
 	response.write data
 	response.end()
+
+app.get '/fonts/:file', (request, response) ->	
+	data = fs.readFileSync './fonts/'+request.params.file
+	response.writeHead 200,
+		'Access-Control-Allow-Origin' : '*',
+	response.write data
+	response.end()
 	
 app.get '/appliances/fetch', (request, response) ->
 

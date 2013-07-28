@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>24 Hour Challenge</title>
+    <title>24 / 365 Challenge</title>
     <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js' type='text/javascript'></script>
     <script src='http://code.jquery.com/ui/1.10.3/jquery-ui.js' type='text/javascript'></script>
     <script src='http://use.edgefonts.net/poiret-one;ultra;passion-one.js' type='text/javascript'></script>
@@ -11,17 +11,16 @@
     <script src='/js/libs/jquery-animate-shadow-min.js' type='text/javascript'></script>
     <script src='/js/libs/backbone.js' type='text/javascript'></script>
     <script src='/js/libs/jquery.timer.js' type='text/javascript'></script>
+    <script src='/js/formatting.js' type='text/javascript'></script>
     <script src='/js/appliance_models.js' type='text/javascript'></script>
     <script src='/js/user_model.js' type='text/javascript'></script>
     <script src='/js/tariff_selector_model.js' type='text/javascript'></script>
     <script src='/js/timer_models.js' type='text/javascript'></script>
     <script src='/js/comparison_models.js' type='text/javascript'></script>
     <script src='/js/client.js' type='text/javascript'></script>
-    <!-- /%script{:type => "text/javascript", -->
-    <!-- / 		:src => "http://127.0.0.1:3000/socket.io/socket.io.js"} -->
-    <script src='/socket.io/socket.io.js' type='text/javascript'></script>
     <script src='/js/libs/jquery-cookie-master/jquery.cookie.js' type='text/javascript'></script>
     <link href='/css/bootstrap.css' rel='stylesheet' type='text/css'>
+    <link href='/css/bootstrap-glyphicons.css' rel='stylesheet' type='text/css'>
     <link href='/css/styles.css' rel='stylesheet' type='text/css'>
   </head>
   <body>
@@ -40,14 +39,19 @@
               <div class='navbar'>
                 <div class='navbar-inner'>
                   <ul class='nav' id='app_menu'>
-                    <li>
-                      <a href='#' id='timer_view_link'>
+                    <li id='timer_view_link'>
+                      <a href='#'>
                         My timings
                       </a>
                     </li>
-                    <li>
-                      <a href='#' id='summary_view_link'>
+                    <li id='summary_view_link'>
+                      <a href='#'>
                         My savings
+                      </a>
+                    </li>
+                    <li id='info_frame_link' style='padding:15px 15px 15px 15px;'>
+                      <a href='#'>
+                        ?
                       </a>
                     </li>
                   </ul>
@@ -70,6 +74,11 @@
         </div>
       </div>
       <div class='row-fluid clearfix' id='page_container'></div>
+      <div class='row-fluid' id='app_footer'>
+        <div class='span2 pull-right'>
+          Reset app
+        </div>
+      </div>
     </div>
     <div id='app_templates'></div>
   </body>

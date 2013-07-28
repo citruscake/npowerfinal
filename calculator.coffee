@@ -160,6 +160,7 @@ exports.calculateComparisons = (data) ->
 				yearly_saving : yearly_saving.toFixed 2
 				alternate_tariff : alternate_tariff
 				saving_reward : saving_reward
+				appliance_data : appliance_data
 			comparison_data.push tariff_comparison
 	
 	console.log comparison_data

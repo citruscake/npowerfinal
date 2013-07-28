@@ -31,8 +31,13 @@
 		.span4
 			:plain
 				<% _.each(appliance_usages, function(appliance_usage) { %>
-					<b><%= appliance_usage.appliance_id %></b></br>
-					<b><%= appliance_usage.reduction_timestamp %></b>
+					<% appliance = _.find(appliance_data, function(appliance) {
+						//alert(appliance.appliance_id+","+appliance_usage.appliance_id);
+						return appliance.appliance_id === appliance_usage.appliance_id
+					}); 
+					console.log(appliance)
+					%>
+					<%= appliance.name %> for <%= formatTimestamp(appliance_usage.reduction_timestamp) %> less a day</br></br>
 				<% }); %>
 				
 		.span4
@@ -65,33 +70,45 @@
 		%>
 	.row-fluid
 		#select_region_frame.span4
-			%select{:id => 'region_select'}
-				:plain
-					<% _.each(region_data, function(region) { 
-						if (region.region_id === user_data.region_id) { %>
-							<option value="<%= region.region_id %>" selected><%= region.title %></option>
-						<% } else { %>
-							<option value="<%= region.region_id %>"><%= region.title %></option>
-						<% } %>
-					<% }); %>
+			.styled-select
+				%select{:id => 'region_select'}
+					:plain
+						<% _.each(region_data, function(region) { 
+							if (region.region_id === user_data.region_id) { %>
+								<option value="<%= region.region_id %>" selected><%= region.title %></option>
+							<% } else { %>
+								<option value="<%= region.region_id %>"><%= region.title %></option>
+							<% } %>
+						<% }); %>
 		#select_provider_frame.span4
-			%select{:id => 'provider_select'}
-				:plain
-					<% _.each(provider_data, function(provider) { 
-						if (provider.provider_id === user_data.provider_id) { %>
-							<option value="<%= provider.provider_id %>" selected><%= provider.title %></option>
-						<% } else { %>
-							<option value="<%= provider.provider_id %>"><%= provider.title %></option>
-						<% } %>
-					<% }); %>
+			.styled-select
+				%select{:id => 'provider_select'}
+					:plain
+						<% _.each(provider_data, function(provider) { 
+							if (provider.provider_id === user_data.provider_id) { %>
+								<option value="<%= provider.provider_id %>" selected><%= provider.title %></option>
+							<% } else { %>
+								<option value="<%= provider.provider_id %>"><%= provider.title %></option>
+							<% } %>
+						<% }); %>
 		#select_tariff_frame.span4
-			%select{:id => 'tariff_select'}
-				:plain
-					<% _.each(tariff_data, function(tariff) { 
-						if (tariff.region_id === user_data.tariff_id) { %>
-							<option value="<%= tariff.tariff_id %>" selected><%= tariff.tariff_label %></option>
-						<% } else { %>
-							<option value="<%= tariff.tariff_id %>"><%= tariff.tariff_label %></option>
-						<% } %>
-					<% }); %>
-		
+			.styled-select
+				%select{:id => 'tariff_select'}
+					:plain
+						<% _.each(tariff_data, function(tariff) { 
+							if (tariff.region_id === user_data.tariff_id) { %>
+								<option value="<%= tariff.tariff_id %>" selected><%= tariff.tariff_label %></option>
+							<% } else { %>
+								<option value="<%= tariff.tariff_id %>"><%= tariff.tariff_label %></option>
+							<% } %>
+						<% }); %>
+						
+%script{:type => "text/template", :id => "info_frame_template"}
+	#info_frame_container
+		#info_frame
+			.row-fluid
+				.span12
+				Some information for you to start off.
+				%a{:href => '#',
+				:id => 'info_frame_close_link'}
+					Close/ Go

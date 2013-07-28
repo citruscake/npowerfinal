@@ -37,8 +37,22 @@ $ ->
 						timerCollection.addDummyTimers applianceCollection.models
 						$('#timer_view_link').trigger 'click'
 						current_page = "timer"
+						#$('#info_frame_link').trigger 'click'
+						initialiseInfoFrameCloseFunctionality()
 					error : (h,response) ->	
 			error : (h,response) ->
+			
+	initialiseInfoFrameCloseFunctionality = ->		
+			
+		$('#info_frame_close_link').on 'click' : (event) ->
+			$('#info_frame_container').animate
+				opacity : 0
+			, 200, 'easeOutSine'
+			, ->
+				$('#info_frame_container').css 'top', '-1000px'
+				$('body').css "overflow", "visible"
+			
+		return false
 	
 	initialisePageCalculator = ->
 
@@ -83,7 +97,8 @@ $ ->
 				#if is_active == 1
 				$('#'+timer.get('appliance_id')+'.cost-display').html running_cost
 					
-			$('#total_cost').html total_cost
+			$('#total_cost').html formatCurrency total_cost
+			console.log total_cost
 			
 		$.timer(updateTimer, 200, true)
 	
@@ -97,25 +112,6 @@ $ ->
 				$('#tariff_options_frame').html tariffSelectorView.render(window.user).el
 				tariffSelectorView.updateTariffData()
 	
-	formatTimestamp = (timestamp) ->
-		time = new Date timestamp
-		formatted_hours = String time.getHours()
-		formatted_minutes = String time.getMinutes()
-		formatted_seconds = String time.getSeconds()
-		formatted_milliseconds = String time.getMilliseconds()		
-		
-		if (formatted_hours.length) < 2
-			formatted_hours = "0" + formatted_hours
-		if (formatted_minutes.length) < 2
-			formatted_minutes = "0" + formatted_minutes
-		if (formatted_seconds.length) < 2
-			formatted_seconds = "0" + formatted_seconds
-		if (formatted_milliseconds.length) < 2
-			formatted_milliseconds = "00" + formatted_milliseconds
-		else if (formatted_milliseconds.length) < 3
-			formatted_milliseconds = "0" + formatted_milliseconds
-		formatted_time = formatted_hours + ":" + formatted_minutes + ":" + formatted_seconds + ":" + formatted_milliseconds
-	
 	calculateSummary = ->
 		timestamp = new Date().getTime()
 		data = 
@@ -127,8 +123,8 @@ $ ->
 			comparisonCollectionView = new ComparisonCollectionView
 				collection : comparisonCollection
 			#comparisonCollection.fetch()		
-			console.log comparisonCollection.toJSON()
-			$('#savings').html comparisonCollectionView.render().el	
+			#console.log comparisonCollection.toJSON()
+			$('#comparisons').html comparisonCollectionView.render().el	
 
 	$('document').ready ->
 	
@@ -170,11 +166,22 @@ $ ->
 			calculateSummary()
 			current_page = "summary"
 			return false
+		
+		$('#info_frame_link').on 'click' : (event) ->
+			$('#info_frame_container').css 'top', '0px'
+			$('body').css "overflow", "hidden"
+			$('#info_frame_container').animate
+				opacity : 1
+			, 200, 'easeOutSine'
+			
 	
 	$.get "/views/fetch", { view : 'models' }, (templates) ->
 						
-		$('#app_templates').append templates				
-								
+		$('#app_templates').append templates		
+
+		$('#app_container').append $('#info_frame_template').html()
+		$('#info_frame_container').css 'top', '-1000px'
+		
 		initialiseApplianceModels()
 		initialiseTimerModels()
 		initialiseComparisonModels()
@@ -192,7 +199,6 @@ $ ->
 		window.user = new UserModel()
 			
 		if typeof($.cookie 'user_id') == 'undefined'
-			console.log "no cookie!1"
 			$.get "/users/generateId", (response) ->
 				user_id = $.parseJSON response
 				cookie_data =

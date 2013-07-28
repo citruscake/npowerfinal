@@ -40,8 +40,13 @@
   <div class='row-fluid'>
     <div class='span4'>
       <% _.each(appliance_usages, function(appliance_usage) { %>
-      	<b><%= appliance_usage.appliance_id %></b></br>
-      	<b><%= appliance_usage.reduction_timestamp %></b>
+      	<% appliance = _.find(appliance_data, function(appliance) {
+      		//alert(appliance.appliance_id+","+appliance_usage.appliance_id);
+      		return appliance.appliance_id === appliance_usage.appliance_id
+      	}); 
+      	console.log(appliance)
+      	%>
+      	<%= appliance.name %> for <%= formatTimestamp(appliance_usage.reduction_timestamp) %> less a day</br></br>
       <% }); %>
     </div>
     <div class='span4'></div>
@@ -73,37 +78,56 @@
   %>
   <div class='row-fluid'>
     <div class='span4' id='select_region_frame'>
-      <select id='region_select'>
-        <% _.each(region_data, function(region) { 
-        	if (region.region_id === user_data.region_id) { %>
-        		<option value="<%= region.region_id %>" selected><%= region.title %></option>
-        	<% } else { %>
-        		<option value="<%= region.region_id %>"><%= region.title %></option>
-        	<% } %>
-        <% }); %>
-      </select>
+      <div class='styled-select'>
+        <select id='region_select'>
+          <% _.each(region_data, function(region) { 
+          	if (region.region_id === user_data.region_id) { %>
+          		<option value="<%= region.region_id %>" selected><%= region.title %></option>
+          	<% } else { %>
+          		<option value="<%= region.region_id %>"><%= region.title %></option>
+          	<% } %>
+          <% }); %>
+        </select>
+      </div>
     </div>
     <div class='span4' id='select_provider_frame'>
-      <select id='provider_select'>
-        <% _.each(provider_data, function(provider) { 
-        	if (provider.provider_id === user_data.provider_id) { %>
-        		<option value="<%= provider.provider_id %>" selected><%= provider.title %></option>
-        	<% } else { %>
-        		<option value="<%= provider.provider_id %>"><%= provider.title %></option>
-        	<% } %>
-        <% }); %>
-      </select>
+      <div class='styled-select'>
+        <select id='provider_select'>
+          <% _.each(provider_data, function(provider) { 
+          	if (provider.provider_id === user_data.provider_id) { %>
+          		<option value="<%= provider.provider_id %>" selected><%= provider.title %></option>
+          	<% } else { %>
+          		<option value="<%= provider.provider_id %>"><%= provider.title %></option>
+          	<% } %>
+          <% }); %>
+        </select>
+      </div>
     </div>
     <div class='span4' id='select_tariff_frame'>
-      <select id='tariff_select'>
-        <% _.each(tariff_data, function(tariff) { 
-        	if (tariff.region_id === user_data.tariff_id) { %>
-        		<option value="<%= tariff.tariff_id %>" selected><%= tariff.tariff_label %></option>
-        	<% } else { %>
-        		<option value="<%= tariff.tariff_id %>"><%= tariff.tariff_label %></option>
-        	<% } %>
-        <% }); %>
-      </select>
+      <div class='styled-select'>
+        <select id='tariff_select'>
+          <% _.each(tariff_data, function(tariff) { 
+          	if (tariff.region_id === user_data.tariff_id) { %>
+          		<option value="<%= tariff.tariff_id %>" selected><%= tariff.tariff_label %></option>
+          	<% } else { %>
+          		<option value="<%= tariff.tariff_id %>"><%= tariff.tariff_label %></option>
+          	<% } %>
+          <% }); %>
+        </select>
+      </div>
+    </div>
+  </div>
+</script>
+<script id='info_frame_template' type='text/template'>
+  <div id='info_frame_container'>
+    <div id='info_frame'>
+      <div class='row-fluid'>
+        <div class='span12'></div>
+        Some information for you to start off.
+        <a href='#' id='info_frame_close_link'>
+          Close/ Go
+        </a>
+      </div>
     </div>
   </div>
 </script>

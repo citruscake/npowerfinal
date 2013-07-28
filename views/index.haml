@@ -1,7 +1,7 @@
 !!!
 %html
 	%head
-		%title 24 Hour Challenge
+		%title 24 / 365 Challenge
 		%script{:type => "text/javascript",
 				:src => "http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"}
 		%script{:type => "text/javascript",
@@ -23,6 +23,8 @@
 		%script{:type => "text/javascript",
 				:src => "/js/libs/jquery.timer.js"}
 		%script{:type => "text/javascript",
+				:src => "/js/formatting.js"}
+		%script{:type => "text/javascript",
 				:src => "/js/appliance_models.js"}
 		%script{:type => "text/javascript",
 				:src => "/js/user_model.js"}
@@ -34,15 +36,14 @@
 				:src => "/js/comparison_models.js"}
 		%script{:type => "text/javascript",
 				:src => "/js/client.js"}
-		//%script{:type => "text/javascript",
-		// 		:src => "http://127.0.0.1:3000/socket.io/socket.io.js"}
-		%script{:type => "text/javascript",
-		 		:src => "/socket.io/socket.io.js"}
 		%script{:type => "text/javascript",
 				:src => "/js/libs/jquery-cookie-master/jquery.cookie.js"}
 		%link{:rel => "stylesheet",
 				:type => "text/css",
 				:href => "/css/bootstrap.css"}
+		%link{:rel => "stylesheet",
+				:type => "text/css",
+				:href => "/css/bootstrap-glyphicons.css"}
 		%link{:rel => "stylesheet",
 				:type => "text/css",
 				:href => "/css/styles.css"}
@@ -60,14 +61,16 @@
 							.navbar
 								.navbar-inner
 									%ul{:class => 'nav', :id => 'app_menu'}
-										%li
-											%a{:href => "#",
-											:id => "timer_view_link"}
+										%li{:id => "timer_view_link"}
+											%a{:href => "#"}
 												My timings
-										%li
-											%a{:href => "#",
-											:id => "summary_view_link"}
+										%li{:id => "summary_view_link"}
+											%a{:href => "#"}
 												My savings
+										%li{:style => "padding:15px 15px 15px 15px;",
+											:id => "info_frame_link"}
+											%a{:href => "#"}
+												?
 				#app_tariff_data.span4.pull-right
 					.row-fluid
 						#total_cost_frame.span8.pull-right
@@ -76,5 +79,8 @@
 					.row-fluid
 						#tariff_options_frame.span8.pull-right
 			#page_container.row-fluid.clearfix
-			
+			#app_footer.row-fluid
+				.span2.pull-right
+					Reset app
+					
 		#app_templates
