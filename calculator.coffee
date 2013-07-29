@@ -42,11 +42,13 @@ exports.calculateComparisons = (data) ->
 
 	timer_data = data.timer_data
 	end_point = data.end_point
-	tariff_data = data.tariff_data
 	user_data = data.user_data
 	reward_data = data.reward_data
 	appliance_data = data.appliance_data
 
+	tariff_data = _.filter data.tariff_data, (tariff) ->
+		return tariff.region_id == user_data.region_id
+	
 	appliance_spend = Array()
 	
 	for timer in timer_data
@@ -55,6 +57,7 @@ exports.calculateComparisons = (data) ->
 		if timer.is_active == 1
 			start_timestamp = timer.start_timestamp
 			total_timestamp += end_point - start_timestamp
+			timer.total_timestamp = total_timestamp
 		appliance_id = timer.appliance_id
 		appliance = _.first _.filter appliance_data, (appliance) -> 
 			appliance.appliance_id == appliance_id
@@ -107,52 +110,85 @@ exports.calculateComparisons = (data) ->
 
 	console.log cheapest_tariffs
 	
-	usage_fractions = Array()
-	user_tariff = _.first _.filter tariff_data, (tariff) ->
+	#usage_fractions = Array()
+	user_tariff = _.find tariff_data, (tariff) ->
 		tariff.tariff_id == user_spend.tariff_id
 	user_appliance_spend = _.filter appliance_spend, (spend) ->
 		spend.tariff_id == user_spend.tariff_id
 		
-	console.log "user appliance spend"
-	console.log user_appliance_spend
-	console.log "ended"	
+	#console.log "user appliance spend"
+	#console.log user_appliance_spend
+	#console.log "ended"	
 	
-	_.each user_appliance_spend, (spend) ->
-		console.log spend.total_spend+" "+user_spend.tariff_spend+" "
-		console.log user_tariff
-		usage_fractions.push 
-			appliance_id : spend.appliance_id
-			fraction : spend.total_spend / (user_spend.tariff_spend - parseFloat(user_tariff.standing_charge))
-		#console.log spend.total_spend+","+user_spend.tariff_spend 
+	#_.each user_appliance_spend, (spend) ->
+	#	console.log spend.total_spend+" "+user_spend.tariff_spend+" "
+	#	console.log user_tariff
+	#	usage_fractions.push 
+	#		appliance_id : spend.appliance_id
+	#		fraction : spend.total_spend / (user_spend.tariff_spend - parseFloat(user_tariff.standing_charge))
+	#	#console.log spend.total_spend+","+user_spend.tariff_spend 
 	
-	console.log usage_fractions
+	#console.log "usage_fractions"
+	#console.log usage_fractions
 	#sort cheapest into ascending order
-	cheapest_tariffs = _.sortBy cheapest_tariffs, (tariff) ->
-		-tariff.tariff_spend
 	
-	console.log cheapest_tariffs
+	cheapest_tariffs = _.sortBy cheapest_tariffs, (tariff) ->
+		tariff.tariff_spend
+	
+	#console.log cheapest_tariffs
 	#console.log user_tariff
+	
 	comparison_data = Array()
 	_.each cheapest_tariffs, (tariff) ->
 		#console.log tariff.tariff_spend+" "+user_spend.tariff_spend
 		if tariff.tariff_spend < user_spend.tariff_spend
 			appliance_usages = Array()
+			
+			reduction_fraction = (parseFloat(tariff.tariff_spend) - parseFloat(user_tariff.standing_charge)) /(parseFloat(user_spend.tariff_spend) - parseFloat(user_tariff.standing_charge))
 			_.each timer_data, (timer) ->
-				usage_fraction = _.first _.filter usage_fractions, (fraction) ->
-					fraction.appliance_id == timer.appliance_id
+			
+				#spend = _.map _.find appliance_spend, (spend) ->
+				#	return appliance_spend.appliance_id == timer.appliance_id
+				#, (spend) ->
+				#	return spend.total_spend
+
+				spend = _.find user_appliance_spend, (spend) ->
+					return spend.appliance_id == timer.appliance_id
+					
+				spend_target = parseFloat(spend.total_spend) * reduction_fraction
+				console.log "reduction_fraction is "+reduction_fraction
+				appliance =  _.find appliance_data, (appliance) ->
+					return appliance.appliance_id == timer.appliance_id
+
+				console.log "spend target is "+spend_target+" for "+appliance.appliance_id
+					
+				wattage = parseFloat appliance.wattage	
+					
+				unit_rate = parseFloat user_tariff.unit_rate
 				
-				reduction_timestamp =  parseFloat(timer.total_timestamp) - ((parseFloat(timer.total_timestamp) * parseFloat(usage_fraction.fraction)) * ( (parseFloat(tariff.tariff_spend) - parseFloat(user_tariff.standing_charge)) /(parseFloat(user_spend.tariff_spend) - parseFloat(user_tariff.standing_charge)) ) )
+				#reduced_timestamp = (spend_target * 1000) / (unitRate * wattage) * (60*60*1000))
+				#reduced_timestamp = ((spend_target * 1000) / (wattage * unit_rate)) * (60*60*1000)
+				#reduced_timestamp = ((parseFloat(spend.total_spend) * 1000) / (wattage * unit_rate)) * (60*60*1000)
+				reduced_timestamp = ((spend_target * 1000) / (wattage * unit_rate)) * (60*60*1000)
+				reduction_timestamp = parseFloat(timer.total_timestamp) - reduced_timestamp
+			
+				console.log "total timestamp = "+timer.total_timestamp+", reduced is "+reduced_timestamp
+			
+				#usage_fraction = _.find usage_fractions, (fraction) ->
+				#	fraction.appliance_id == timer.appliance_id
+				
+				#reduction_timestamp =  parseFloat(timer.total_timestamp) - ((parseFloat(timer.total_timestamp) * parseFloat(usage_fraction.fraction)) * (  ) )
 				appliance_usages.push
 					appliance_id : timer.appliance_id
 					reduction_timestamp : reduction_timestamp
 					
 			daily_saving = user_spend.tariff_spend - tariff.tariff_spend
 			yearly_saving = daily_saving * 365
-			alternate_tariff = _.first _.filter tariff_data, (_tariff) ->
+			alternate_tariff = _.find tariff_data, (_tariff) ->
 				tariff.tariff_id == _tariff.tariff_id
 			saving_reward = _.max reward_data, (reward) ->
 				reward.cost <= yearly_saving
-			console.log appliance_usages
+			#console.log appliance_usages
 			tariff_comparison = 
 				comparison_id : tariff.tariff_id
 				appliance_usages : appliance_usages
@@ -163,6 +199,6 @@ exports.calculateComparisons = (data) ->
 				appliance_data : appliance_data
 			comparison_data.push tariff_comparison
 	
-	console.log comparison_data
+	#console.log comparison_data
 			
 	return comparison_data

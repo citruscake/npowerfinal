@@ -21,7 +21,7 @@
   };
 
   exports.getAppliances = function(callback) {
-    return connection.query('SELECT * FROM appliances WHERE 1', function(error, rows, fields) {
+    return connection.query('SELECT * FROM appliances WHERE 1 ORDER BY name ASC', function(error, rows, fields) {
       if (error) {
         throw error;
       } else {
@@ -51,11 +51,37 @@
     });
   };
 
+  exports.createUserData = function(user_id, start_timestamp, callback) {
+    console.log("INSERT INTO users VALUES ('" + user_id + "', '" + start_timestamp + "', 10, 1, 1)");
+    return connection.query("INSERT INTO users VALUES ('" + user_id + "', '" + start_timestamp + "', 10, 1, 1)", function(error, rows, fields) {
+      if (error) {
+        throw error;
+      } else {
+        callback("success");
+      }
+    });
+  };
+
   exports.saveUserData = function(user_id, region_id, provider_id, tariff_id, callback) {
     return connection.query("UPDATE users SET region_id = '" + region_id + "', provider_id = '" + provider_id + "', tariff_id = '" + tariff_id + "' WHERE user_id = '" + user_id + "'", function(error, rows, fields) {
       if (error) {
         throw error;
       } else {
+        callback("success");
+      }
+    });
+  };
+
+  exports.deleteUserData = function(user_id, callback) {
+    return connection.query("DELETE FROM users WHERE user_id = '" + user_id + "'", function(error, rows, fields) {
+      if (error) {
+        throw error;
+      } else {
+        connection.query("DELETE FROM timers WHERE user_id = '" + user_id + "'", function(error, rows, fields) {
+          if (error) {
+            throw error;
+          }
+        });
         callback("success");
       }
     });

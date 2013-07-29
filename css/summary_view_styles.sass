@@ -1,31 +1,75 @@
 #summary_view
 	.row-fluid
-		.span12
-			width : 95%
-			margin-left : 2.5%
+		#summary_frame.span12
+			width : 960px
+			margin-left : 60px
+			margin-top : 5px
 	#usage_overview	
 		margin-top : 20px
-		#summary
-			height : 300px
-			background-color: #222222
-			.row-fluid
-				.span12
-					margin : 0px
-					h5
-						margin : 0px
-						color : #dddddd
-						font-size : 15px
-						font-family : sans-serif
 		#savings
-			height: 300px
-			background-color : #333333
 			.row-fluid
 				.span12
 					margin : 0px
 					h5
 						margin : 0px
-						color : #dddddd
-						font-size : 15px
-						font-family : sans-serif
+						color : #eeeeee
+						font-size : 25px
+						#font-family : Source Sans Pro, sans serif
 			#comparisons
-				color : #ffffff
+				ul
+					list-style-type : none
+					li
+						background-color : rgba(34, 34, 34, 0.4)
+						border-radius : 3px
+						margin-bottom : 20px
+						-webkit-box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
+						box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
+				color : #eeeeee
+				.comparison-frame
+					margin-left : 20px
+					.comparison-title
+						h3
+							margin : 0px
+							padding : 5px 0px 10px 0px
+							color : #eeeeee
+							#font-family : Source Sans Pro
+					.comparison-table
+						border-radius : 3px
+						width : 355px
+						padding : 15px 15px 15px 25px
+						background-color : rgba(88, 97, 97, 0.2)
+						margin : 0px
+						table
+							margin-top : 15px
+							tr
+								td
+									text-align : right
+									padding-right : 10px
+					.comparison-or
+						background-color : rgba(34, 220, 255, 0.8)
+						#background-color : #333333
+						height : 100px
+						width : 100px
+						margin : 0px
+						margin-left : 15px
+						margin-top : 25px
+						border-radius : 3px
+						-webkit-box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
+						box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
+						.row-fluid
+							.span12
+								.or-frame
+									position : relative
+									font-size : 50px
+									width : 60px
+									height : 60px
+									margin-top : 40px
+									margin-left : 13px
+									font-family : Fredoka One, sans-serif
+					.comparison-reward
+						border-radius : 3px
+						width : 355px
+						padding : 15px 15px 15px 25px
+						background-color : rgba(88, 97, 97, 0.2)
+						margin : 0px
+						margin-left : 15px

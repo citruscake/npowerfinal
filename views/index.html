@@ -6,6 +6,8 @@
     <script src='http://code.jquery.com/ui/1.10.3/jquery-ui.js' type='text/javascript'></script>
     <script src='http://use.edgefonts.net/poiret-one;ultra;passion-one.js' type='text/javascript'></script>
     <link href='http://fonts.googleapis.com/css?family=Cinzel' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+    <link href='/img/favicon.ico' rel='shortcut icon'>
     <link href='http://fonts.googleapis.com/css?family=Fredoka+One' rel='stylesheet' type='text/css'>
     <script src='/js/libs/underscore.js' type='text/javascript'></script>
     <script src='/js/libs/jquery-animate-shadow-min.js' type='text/javascript'></script>
@@ -29,7 +31,7 @@
         <div class='span6' id='app_nav'>
           <div class='row-fluid'>
             <div class='span5'>
-              <div id='brand-frame'>
+              <div id='brand_frame'>
                 <div class='brand'>
                   <img src='/img/titleimage.png'>
                 </div>
@@ -63,9 +65,7 @@
         <div class='span4 pull-right' id='app_tariff_data'>
           <div class='row-fluid'>
             <div class='span8 pull-right' id='total_cost_frame'>
-              <div class='pull-right' id='total_cost'>
-                &#163;36.21
-              </div>
+              <div class='pull-right' id='total_cost'></div>
             </div>
           </div>
           <div class='row-fluid'>
@@ -75,9 +75,12 @@
       </div>
       <div class='row-fluid clearfix' id='page_container'></div>
       <div class='row-fluid' id='app_footer'>
-        <div class='span2 pull-right'>
-          Reset app
+        <div class='span2 pull-right' id='reset_frame'>
+          <a href='#' id='reset_app_link'>
+            Reset app?
+          </a>
         </div>
+        <div class='span2 pull-right' id='welcome_frame'></div>
       </div>
     </div>
     <div id='app_templates'></div>

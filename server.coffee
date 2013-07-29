@@ -41,7 +41,9 @@ app.get '/', (request, response) ->
 app.get '/already_open', (request, response) ->
 	response.writeHead 200,
 			'Access-Control-Allow-Origin' : '*'
-	response.write "You have a page already open, please use only one instance at a time to prevent errors."
+	response.write "You have a page already open, please use only one instance at a time to prevent errors.\n\n"
+	response.write "If you cannot access the app then your browser may have not been closed properly in your last session. Try clearing your cookies "
+	response.write "and the problem should solve itself."
 	response.end()
 	
 app.get '/js/:folder1?/:folder2?/:file', (request, response) ->
@@ -166,14 +168,27 @@ app.all '/users/save', (request, response) ->
 		response.write JSON.stringify status
 		response.end()
 			
+app.all '/users/delete', (request, response) ->
+	response.writeHead 200, 
+		'Access-Control-Allow-Origin' : '*'
+		'Access-Control-Allow-Methods' : 'POST'
+		'Access-Control-Allow-Headers' : 'Content-Type'
 	
-app.get '/users/generateId', (request, response) ->
+	user_id = request.body.user_id
+	console.log request.body
+	database.deleteUserData user_id, (status) ->
+		response.write JSON.stringify status
+		response.end()
+	
+app.all '/users/create', (request, response) ->
 	response.writeHead 200,
 		'Access-Control-Allow-Origin' : '*'
 	user_id = user_id_generator.generate()
+	start_timestamp = request.body.start_timestamp
 	user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
-	response.write JSON.stringify user_id
-	response.end()
+	database.createUserData user_id, start_timestamp, (status) ->
+		response.write JSON.stringify user_id
+		response.end()
 
 app.get '/users/fetch/:user_id', (request, response) ->
 	response.writeHead 200, 

@@ -62,23 +62,44 @@
         }
       },
       animateColor: function(appliance_id, is_active, timeframe) {
-        var button, name;
+        var button, cost, name, shadow, time;
         button = $('#' + appliance_id + '.button');
+        shadow = $('#' + appliance_id + '.button-shadow');
+        cost = $('#' + appliance_id + '.cost-display');
+        time = $('#' + appliance_id + '.time-display');
         name = $('#' + appliance_id + '.name');
         console.log(button);
         if (is_active === 0) {
           button.animate({
             'background-color': '#666666'
           }, 0);
-          return name.delay(200).animate({
-            'color': '#333333'
+          shadow.delay(200).animate({
+            'background-color': '#444444'
+          }, 0);
+          name.delay(200).animate({
+            'color': '#555555'
+          }, 0);
+          cost.delay(200).animate({
+            'color': '#555555'
+          }, 0);
+          return time.delay(200).animate({
+            'color': '#555555'
           }, 0);
         } else if (is_active === 1) {
           button.animate({
             'background-color': 'rgb(34, 220, 255)'
           }, timeframe);
-          return name.delay(200).animate({
+          shadow.delay(200).animate({
+            'background-color': 'rgb(34, 220, 255)'
+          }, timeframe);
+          name.delay(200).animate({
             'color': '#eeeeee'
+          }, 0);
+          cost.delay(200).animate({
+            'color': '#cccccc'
+          }, 0);
+          return time.delay(200).animate({
+            'color': '#cccccc'
           }, 0);
         }
       },
@@ -96,10 +117,14 @@
         is_active = this.model.get('is_active');
         if (is_active === 0) {
           $(this.el).find('#' + appliance_id + '.button').css('background-color', '#666666');
+          $(this.el).find('#' + appliance_id + '.button-shadow').css('background-color', '#444444');
         } else {
           $(this.el).find('#' + appliance_id + '.button').css('background-color', 'rgb(34, 220, 255)');
+          $(this.el).find('#' + appliance_id + '.button-shadow').css('background-color', 'rgb(34, 220, 255)');
           $(this.el).find('#' + appliance_id + '.button').css('top', '-3px');
           $(this.el).find('#' + appliance_id + '.name').css('color', '#eeeeee');
+          $(this.el).find('#' + appliance_id + '.cost-display').css('color', '#cccccc');
+          $(this.el).find('#' + appliance_id + '.time-display').css('color', '#cccccc');
         }
         return this;
       }

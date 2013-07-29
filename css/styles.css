@@ -1,9 +1,9 @@
-#timer_gallery .row-fluid {
-  background-color: #4d0853;
+#timer_gallery {
+  margin-top: 40px;
 }
 #timer_gallery .row-fluid .timer-container {
   margin-left: 0px;
-  padding-top: 10px;
+  width: 270px;
 }
 #timer_gallery .row-fluid .timer-container .row-fluid {
   background-color: transparent;
@@ -12,18 +12,18 @@
   width: 70px;
 }
 #timer_gallery .row-fluid .timer-container .row-fluid .span4 .button-container {
-  height: 50px;
+  height: 60px;
   width: 50px;
   margin-left: 10px;
   border-radius: 2px;
+  margin-top: 3px;
 }
 #timer_gallery .row-fluid .timer-container .row-fluid .span4 .button-container .button {
-  height: 100%;
-  width: 100%;
-  background-color: #cccccc;
+  height: 50px;
+  width: 50px;
   border-radius: 50%;
-  border-color: #bbbbbb;
-  border-width: 0px;
+  border-color: #222222;
+  border-width: 3px;
   border-style: solid;
   cursor: pointer;
   position: relative;
@@ -31,15 +31,24 @@
   z-index: 300;
 }
 #timer_gallery .row-fluid .timer-container .row-fluid .span4 .button-container .button-shadow {
-  height: 100%;
-  width: 100%;
-  background-color: #333333;
+  height: 50px;
+  width: 50px;
+  background-color: #444444;
+  border-color: #222222;
+  border-width: 1px;
+  border-style: solid;
   border-radius: 50%;
-  top: -100%;
+  top: -50px;
   position: relative;
+  -webkit-box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.2);
+  box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.2);
 }
 #timer_gallery .row-fluid .timer-container .row-fluid .span8 {
   margin-left: 0px;
+}
+#timer_gallery .row-fluid .timer-container .row-fluid .span8 .row-fluid .span12 {
+  min-height: 20px;
+  position: relative;
 }
 #timer_gallery .row-fluid .timer-container .row-fluid .span8 .row-fluid .span12 .title-container {
   position: relative;
@@ -47,15 +56,23 @@
 }
 #timer_gallery .row-fluid .timer-container .row-fluid .span8 .row-fluid .span12 .title-container h5 {
   margin: 0px;
-  margin-top: -10px;
-  font-family: sans-serif;
+  #font-family: Source Sans Pro, sans serif;
+  #font-family: sans serif;
   letter-spacing: 1 px;
-  font-size: 18px;
-  line-height: 25px;
-  color: #777777;
+  font-size: 20px;
+  line-height: 20px;
+  color: #444444;
+  padding: 3px;
+  margin-left: -4px;
+  margin-top: -3px;
 }
-#timer_gallery .row-fluid .timer-container .row-fluid .span8 .row-fluid .span12 {
-  position: relative;
+
+.time-display {
+  color: #555555;
+}
+
+.cost-display {
+  color: #555555;
 }
 
 .timeline_container {
@@ -140,41 +157,87 @@
   margin-left: -13px;
 }
 
-#summary_view .row-fluid .span12 {
-  width: 95%;
-  margin-left: 2.5%;
+#summary_view .row-fluid #summary_frame.span12 {
+  width: 960px;
+  margin-left: 60px;
+  margin-top: 5px;
 }
 #summary_view #usage_overview {
   margin-top: 20px;
-}
-#summary_view #usage_overview #summary {
-  height: 300px;
-  background-color: #222222;
-}
-#summary_view #usage_overview #summary .row-fluid .span12 {
-  margin: 0px;
-}
-#summary_view #usage_overview #summary .row-fluid .span12 h5 {
-  margin: 0px;
-  color: #dddddd;
-  font-size: 15px;
-  font-family: sans-serif;
-}
-#summary_view #usage_overview #savings {
-  height: 300px;
-  background-color: #333333;
 }
 #summary_view #usage_overview #savings .row-fluid .span12 {
   margin: 0px;
 }
 #summary_view #usage_overview #savings .row-fluid .span12 h5 {
   margin: 0px;
-  color: #dddddd;
-  font-size: 15px;
-  font-family: sans-serif;
+  color: #eeeeee;
+  font-size: 25px;
+  #font-family: Source Sans Pro, sans serif;
 }
 #summary_view #usage_overview #savings #comparisons {
-  color: white;
+  color: #eeeeee;
+}
+#summary_view #usage_overview #savings #comparisons ul {
+  list-style-type: none;
+}
+#summary_view #usage_overview #savings #comparisons ul li {
+  background-color: rgba(34, 34, 34, 0.4);
+  border-radius: 3px;
+  margin-bottom: 20px;
+  -webkit-box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
+  box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame {
+  margin-left: 20px;
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-title h3 {
+  margin: 0px;
+  padding: 5px 0px 10px 0px;
+  color: #eeeeee;
+  #font-family: Source Sans Pro;
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-table {
+  border-radius: 3px;
+  width: 355px;
+  padding: 15px 15px 15px 25px;
+  background-color: rgba(88, 97, 97, 0.2);
+  margin: 0px;
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-table table {
+  margin-top: 15px;
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-table table tr td {
+  text-align: right;
+  padding-right: 10px;
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-or {
+  background-color: rgba(34, 220, 255, 0.8);
+  #background-color: #333333;
+  height: 100px;
+  width: 100px;
+  margin: 0px;
+  margin-left: 15px;
+  margin-top: 25px;
+  border-radius: 3px;
+  -webkit-box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
+  box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-or .row-fluid .span12 .or-frame {
+  position: relative;
+  font-size: 50px;
+  width: 60px;
+  height: 60px;
+  margin-top: 40px;
+  margin-left: 13px;
+  font-family: Fredoka One, sans-serif;
+}
+#summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-reward {
+  border-radius: 3px;
+  width: 355px;
+  padding: 15px 15px 15px 25px;
+  background-color: rgba(88, 97, 97, 0.2);
+  margin: 0px;
+  margin-left: 15px;
 }
 
 html {
@@ -209,7 +272,7 @@ body {
 #app_container #app_header #app_nav {
   min-width: 620px;
 }
-#app_container #app_header #app_nav .row-fluid .span5 #brand-frame {
+#app_container #app_header #app_nav .row-fluid .span5 #brand_frame {
   background-color: #181818;
   width: 200px;
   height: 100px;
@@ -218,8 +281,9 @@ body {
   border-radius: 1px;
   -webkit-box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
   box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
+  cursor: pointer;
 }
-#app_container #app_header #app_nav .row-fluid .span5 #brand-frame .brand {
+#app_container #app_header #app_nav .row-fluid .span5 #brand_frame .brand {
   font-size: 38px;
   line-height: 40px;
   color: #eeeeee;
@@ -274,7 +338,7 @@ body {
 }
 #app_container #app_header #app_tariff_data .row-fluid #total_cost_frame {
   height: 50px;
-  width: 350px;
+  width: 280px;
   margin-top: 10px;
   margin-right: 10px;
 }
@@ -302,7 +366,7 @@ body {
   width: 215px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_region_frame .styled-select #region_select {
-  font-family: sans-serif;
+  font-family: Fredoka One, sans-serif;
   font-size: 15px;
   color: #dddddd;
   line-height: 40px;
@@ -315,10 +379,10 @@ body {
   box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
   background-image: url("/img/downarrow.png");
   background-repeat: no-repeat;
-  background-color: #333333;
+  background-color: #222222;
   option-line-height: 40px;
   width: 240px;
-  background-position: 87% 40%;
+  background-position: 88% 40%;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_region_frame .styled-select #region_select:focus {
   outline: none;
@@ -333,7 +397,7 @@ body {
   overflow: hidden;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_provider_frame .styled-select #provider_select {
-  font-family: sans-serif;
+  font-family: Fredoka One, sans-serif;
   font-size: 15px;
   color: #dddddd;
   line-height: 40px;
@@ -346,9 +410,9 @@ body {
   box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
   background-image: url("/img/downarrow.png");
   background-repeat: no-repeat;
-  background-color: #333333;
+  background-color: #222222;
   option-line-height: 40px;
-  background-position: 64% 40%;
+  background-position: 63% 40%;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_provider_frame .styled-select #provider_select:focus {
   outline: none;
@@ -363,7 +427,7 @@ body {
   overflow: hidden;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_tariff_frame .styled-select #tariff_select {
-  font-family: sans-serif;
+  font-family: Fredoka One, sans-serif;
   font-size: 15px;
   color: #dddddd;
   line-height: 40px;
@@ -376,12 +440,29 @@ body {
   box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
   background-image: url("/img/downarrow.png");
   background-repeat: no-repeat;
-  background-color: #333333;
+  background-color: #222222;
   option-line-height: 40px;
-  background-position: 48% 40%;
+  background-position: 47.5% 40%;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_tariff_frame .styled-select #tariff_select:focus {
   outline: none;
+}
+#app_container #app_footer #reset_frame {
+  padding-top: 5px;
+  padding-right: 5px;
+  text-align: right;
+  width: 80px;
+}
+#app_container #app_footer #reset_frame a {
+  color: #555555;
+  text-decoration: underline;
+}
+#app_container #app_footer #welcome_frame {
+  width: 200px;
+  padding-top: 5px;
+  padding-right: 10px;
+  text-align: right;
+  color: #555555;
 }
 #app_container #info_frame_container {
   height: 100%;
@@ -396,7 +477,7 @@ body {
   top: 80px;
   width: 1000px;
   height: 400px;
-  background-color: #333333;
+  background-color: #222222;
   position: relative;
   margin-left: auto;
   margin-right: auto;

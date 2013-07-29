@@ -13,7 +13,7 @@
 						:plain
 							<div class="button" id="<%= appliance_id %>">
 							</div>
-							<div class="button-shadow"></div>
+							<div class="button-shadow" id="<%= appliance_id %>"></div>
 				.span8
 					.row-fluid
 						.span12
@@ -22,28 +22,93 @@
 									:plain
 										<div class="name" id="<%= appliance_id %>"><%= name %></div>
 					.row-fluid
-						
+						.span12
+							:plain
+								<div class="time-display" id="<%= appliance_id %>"></div>
+					.row-fluid
+						.span12
+							:plain
+								<div class="cost-display" id="<%= appliance_id %>"></div>
 			
 %script{:type => "text/template", :id => "comparison_frame"}
-	.row-fluid
-		To save &#163;<%= daily_saving %>a day / &#163;<%= yearly_saving %> a year...
-	.row-fluid
-		.span4
-			:plain
-				<% _.each(appliance_usages, function(appliance_usage) { %>
-					<% appliance = _.find(appliance_data, function(appliance) {
-						//alert(appliance.appliance_id+","+appliance_usage.appliance_id);
-						return appliance.appliance_id === appliance_usage.appliance_id
-					}); 
-					console.log(appliance)
-					%>
-					<%= appliance.name %> for <%= formatTimestamp(appliance_usage.reduction_timestamp) %> less a day</br></br>
-				<% }); %>
+	.comparison-frame.row-fluid
+		.span12
+			.row-fluid
+				.comparison-title.span12
+					%h3
+						To save &#163;<%= daily_saving %> a day / &#163;<%= yearly_saving %> a year...
+			.row-fluid
+				.comparison-table.span4
+					.row-fluid
+						.span12
+							You could reduce your daily use of the following appliances by ...
+					.row-fluid
+						.span12
+							%table
+								%tr
+									%td
+										:plain
+									%td
+										Hours
+									%td
+										Mins
+									%td
+										Secs
+									%td
+										Mils
+								:plain		
+									<% _.each(appliance_usages, function(appliance_usage) { %>
+										<% appliance = _.find(appliance_data, function(appliance) {
+											//alert(appliance.appliance_id+","+appliance_usage.appliance_id);
+											return appliance.appliance_id === appliance_usage.appliance_id
+										});
+										reduction_timestamp = formatTimestamp(appliance_usage.reduction_timestamp, false)
+									%>
+								%tr
+									%td
+										<%= appliance.name %>
+									%td
+										<%= reduction_timestamp[0] %>
+									%td
+										<%= reduction_timestamp[1] %>
+									%td
+										<%= reduction_timestamp[2] %>
+									%td
+										<%= reduction_timestamp[3] %>
+								<% }); %>
+				.comparison-or.span4
+					.row-fluid
+						.span12
+							.or-frame
+								OR
+		
+				.comparison-reward.span4
+					.row-fluid
+						.span12
+							Switch to this tariff :
+							:plain
+								<% provider = _.find(window.tariffSelector.get('provider_data'), function(provider) {
+									return provider.provider_id == alternate_tariff.provider_id;
+								}); %>
+								<% region = _.find(window.tariffSelector.get('region_data'), function(region) {
+									return region.region_id == alternate_tariff.region_id;
+								}); %>
+								<% console.log(window.tariffSelector.get('provider_data')); %>
+					.row-fluid
+						.span12
+							Provider : <%= provider.title %>
+					.row-fluid
+						.span12
+							Region : <%= region.title %>
+					.row-fluid
+						.span12
+							Tariff : <%= alternate_tariff.tariff_label %>
+			.row-fluid
+				.span12
+					%h3
+						That's enough saving to purchase a <%= saving_reward.title %>
 				
-		.span4
-		
-		
-		.span4
+				
 %script{:type => "text/template", :id => "tariff_selector"}
 	:plain
 		<%
@@ -54,12 +119,15 @@
 			regional_tariffs = _.filter(tariff_selector_data.tariff_data,function(tariff) {
 				return tariff.region_id === user_data.region_id;
 			});
-			provider_ids = _.uniq(regional_tariffs, function(tariff) {
+			provider_ids = _.uniq(_.map(regional_tariffs, function(tariff) {
 				return tariff.provider_id;
-			});
+			}));
 			
 			provider_data = _.sortBy(_.filter(tariff_selector_data.provider_data, function(provider) {
-				return $.inArray(provider.provider_id, provider_ids);
+				if($.inArray(provider.provider_id, provider_ids) != -1)
+					return true
+				else
+					return false
 			}), function(provider) {
 				return provider.title;
 			});
@@ -112,3 +180,7 @@
 				%a{:href => '#',
 				:id => 'info_frame_close_link'}
 					Close/ Go
+
+%script{:type => "text/template", :id => "summary_frame_template"}
+	:plain
+		<% console.log() %>

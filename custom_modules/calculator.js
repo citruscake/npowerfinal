@@ -46,13 +46,15 @@
   };
 
   exports.calculateComparisons = function(data) {
-    var appliance, appliance_data, appliance_id, appliance_spend, cheapest_tariffs, comparison_data, end_point, highest_tariff, reward_data, start_timestamp, tariff, tariff_appliance_spend, tariff_data, tariff_id, tariff_spend, timer, timer_data, total_timestamp, usage_fractions, user_appliance_spend, user_data, user_spend, user_tariff, wattage, _i, _j, _k, _len, _len1, _len2;
+    var appliance, appliance_data, appliance_id, appliance_spend, cheapest_tariffs, comparison_data, end_point, highest_tariff, reward_data, start_timestamp, tariff, tariff_appliance_spend, tariff_data, tariff_id, tariff_spend, timer, timer_data, total_timestamp, user_appliance_spend, user_data, user_spend, user_tariff, wattage, _i, _j, _k, _len, _len1, _len2;
     timer_data = data.timer_data;
     end_point = data.end_point;
-    tariff_data = data.tariff_data;
     user_data = data.user_data;
     reward_data = data.reward_data;
     appliance_data = data.appliance_data;
+    tariff_data = _.filter(data.tariff_data, function(tariff) {
+      return tariff.region_id === user_data.region_id;
+    });
     appliance_spend = Array();
     for (_i = 0, _len = timer_data.length; _i < _len; _i++) {
       timer = timer_data[_i];
@@ -61,6 +63,7 @@
       if (timer.is_active === 1) {
         start_timestamp = timer.start_timestamp;
         total_timestamp += end_point - start_timestamp;
+        timer.total_timestamp = total_timestamp;
       }
       appliance_id = timer.appliance_id;
       appliance = _.first(_.filter(appliance_data, function(appliance) {
@@ -118,40 +121,37 @@
       }
     }
     console.log(cheapest_tariffs);
-    usage_fractions = Array();
-    user_tariff = _.first(_.filter(tariff_data, function(tariff) {
+    user_tariff = _.find(tariff_data, function(tariff) {
       return tariff.tariff_id === user_spend.tariff_id;
-    }));
+    });
     user_appliance_spend = _.filter(appliance_spend, function(spend) {
       return spend.tariff_id === user_spend.tariff_id;
     });
-    console.log("user appliance spend");
-    console.log(user_appliance_spend);
-    console.log("ended");
-    _.each(user_appliance_spend, function(spend) {
-      console.log(spend.total_spend + " " + user_spend.tariff_spend + " ");
-      console.log(user_tariff);
-      return usage_fractions.push({
-        appliance_id: spend.appliance_id,
-        fraction: spend.total_spend / (user_spend.tariff_spend - parseFloat(user_tariff.standing_charge))
-      });
-    });
-    console.log(usage_fractions);
     cheapest_tariffs = _.sortBy(cheapest_tariffs, function(tariff) {
-      return -tariff.tariff_spend;
+      return tariff.tariff_spend;
     });
-    console.log(cheapest_tariffs);
     comparison_data = Array();
     _.each(cheapest_tariffs, function(tariff) {
-      var alternate_tariff, appliance_usages, daily_saving, saving_reward, tariff_comparison, yearly_saving;
+      var alternate_tariff, appliance_usages, daily_saving, reduction_fraction, saving_reward, tariff_comparison, yearly_saving;
       if (tariff.tariff_spend < user_spend.tariff_spend) {
         appliance_usages = Array();
+        reduction_fraction = (parseFloat(tariff.tariff_spend) - parseFloat(user_tariff.standing_charge)) / (parseFloat(user_spend.tariff_spend) - parseFloat(user_tariff.standing_charge));
         _.each(timer_data, function(timer) {
-          var reduction_timestamp, usage_fraction;
-          usage_fraction = _.first(_.filter(usage_fractions, function(fraction) {
-            return fraction.appliance_id === timer.appliance_id;
-          }));
-          reduction_timestamp = parseFloat(timer.total_timestamp) - ((parseFloat(timer.total_timestamp) * parseFloat(usage_fraction.fraction)) * ((parseFloat(tariff.tariff_spend) - parseFloat(user_tariff.standing_charge)) / (parseFloat(user_spend.tariff_spend) - parseFloat(user_tariff.standing_charge))));
+          var reduced_timestamp, reduction_timestamp, spend, spend_target, unit_rate;
+          spend = _.find(user_appliance_spend, function(spend) {
+            return spend.appliance_id === timer.appliance_id;
+          });
+          spend_target = parseFloat(spend.total_spend) * reduction_fraction;
+          console.log("reduction_fraction is " + reduction_fraction);
+          appliance = _.find(appliance_data, function(appliance) {
+            return appliance.appliance_id === timer.appliance_id;
+          });
+          console.log("spend target is " + spend_target + " for " + appliance.appliance_id);
+          wattage = parseFloat(appliance.wattage);
+          unit_rate = parseFloat(user_tariff.unit_rate);
+          reduced_timestamp = ((spend_target * 1000) / (wattage * unit_rate)) * (60 * 60 * 1000);
+          reduction_timestamp = parseFloat(timer.total_timestamp) - reduced_timestamp;
+          console.log("total timestamp = " + timer.total_timestamp + ", reduced is " + reduced_timestamp);
           return appliance_usages.push({
             appliance_id: timer.appliance_id,
             reduction_timestamp: reduction_timestamp
@@ -159,13 +159,12 @@
         });
         daily_saving = user_spend.tariff_spend - tariff.tariff_spend;
         yearly_saving = daily_saving * 365;
-        alternate_tariff = _.first(_.filter(tariff_data, function(_tariff) {
+        alternate_tariff = _.find(tariff_data, function(_tariff) {
           return tariff.tariff_id === _tariff.tariff_id;
-        }));
+        });
         saving_reward = _.max(reward_data, function(reward) {
           return reward.cost <= yearly_saving;
         });
-        console.log(appliance_usages);
         tariff_comparison = {
           comparison_id: tariff.tariff_id,
           appliance_usages: appliance_usages,
@@ -178,7 +177,6 @@
         return comparison_data.push(tariff_comparison);
       }
     });
-    console.log(comparison_data);
     return comparison_data;
   };
 

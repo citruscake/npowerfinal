@@ -15,7 +15,7 @@ exports.connect = (host, user, password, database) ->
 			throw error
 	
 exports.getAppliances = (callback) ->
-	connection.query 'SELECT * FROM appliances WHERE 1', (error,rows,fields) ->
+	connection.query 'SELECT * FROM appliances WHERE 1 ORDER BY name ASC', (error,rows,fields) ->
 		if error
 			throw error
 		else
@@ -38,12 +38,33 @@ exports.getUserData = (user_id, callback) ->
 		else
 			callback rows
 			return
+			
+exports.createUserData = (user_id, start_timestamp, callback) ->
+	console.log "INSERT INTO users VALUES ('"+user_id+"', '"+start_timestamp+"', 10, 1, 1)"
+	connection.query "INSERT INTO users VALUES ('"+user_id+"', '"+start_timestamp+"', 10, 1, 1)", (error,rows,fields) ->
+		if error
+			throw error
+		else
+			callback "success"
+			return
 
 exports.saveUserData = (user_id, region_id, provider_id, tariff_id, callback) ->			
 	connection.query "UPDATE users SET region_id = '"+region_id+"', provider_id = '"+provider_id+"', tariff_id = '"+tariff_id+"' WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
 		if error
 			throw error
 		else
+			callback "success"
+			return	
+			
+exports.deleteUserData = (user_id, callback) ->
+	connection.query "DELETE FROM users WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
+		if error
+			throw error
+		else
+			connection.query "DELETE FROM timers WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
+				if error
+					throw error
+
 			callback "success"
 			return	
 	

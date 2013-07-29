@@ -52,7 +52,9 @@
     response.writeHead(200, {
       'Access-Control-Allow-Origin': '*'
     });
-    response.write("You have a page already open, please use only one instance at a time to prevent errors.");
+    response.write("You have a page already open, please use only one instance at a time to prevent errors.\n\n");
+    response.write("If you cannot access the app then your browser may have not been closed properly in your last session. Try clearing your cookies ");
+    response.write("and the problem should solve itself.");
     return response.end();
   });
 
@@ -216,15 +218,33 @@
     });
   });
 
-  app.get('/users/generateId', function(request, response) {
+  app.all('/users/delete', function(request, response) {
     var user_id;
+    response.writeHead(200, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    user_id = request.body.user_id;
+    console.log(request.body);
+    return database.deleteUserData(user_id, function(status) {
+      response.write(JSON.stringify(status));
+      return response.end();
+    });
+  });
+
+  app.all('/users/create', function(request, response) {
+    var start_timestamp, user_id;
     response.writeHead(200, {
       'Access-Control-Allow-Origin': '*'
     });
     user_id = user_id_generator.generate();
+    start_timestamp = request.body.start_timestamp;
     user_id = '2a550081-364e-4aa5-b438-4b21f60c158e';
-    response.write(JSON.stringify(user_id));
-    return response.end();
+    return database.createUserData(user_id, start_timestamp, function(status) {
+      response.write(JSON.stringify(user_id));
+      return response.end();
+    });
   });
 
   app.get('/users/fetch/:user_id', function(request, response) {

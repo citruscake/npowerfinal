@@ -3,6 +3,7 @@
     var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, current_page, fetchModels, in_use, initialiseInfoFrameCloseFunctionality, initialisePageCalculator, initialiseTariffSelector, summary_view, timerCollection, timerCollectionView, timer_view;
     summary_view = null;
     timer_view = null;
+    window.tariffSelector = null;
     applianceCollection = null;
     applianceCollectionView = null;
     timerCollection = null;
@@ -12,6 +13,7 @@
     window.user = null;
     window.tariff = null;
     current_page = null;
+    $('#timer_view_link').data("loading");
     in_use = $.cookie('in_use');
     if (in_use === 'true') {
       window.location.href = "/already_open";
@@ -24,7 +26,7 @@
       $.removeCookie('in_use');
       return null;
     };
-    fetchModels = function() {
+    fetchModels = function(existing_user) {
       return applianceCollection.fetch({
         success: function(collection, response) {
           console.log(applianceCollection.models);
@@ -36,7 +38,14 @@
               timerCollection.addDummyTimers(applianceCollection.models);
               $('#timer_view_link').trigger('click');
               current_page = "timer";
-              return initialiseInfoFrameCloseFunctionality();
+              if (existing_user === false) {
+                $('#info_frame_link').trigger('click');
+                $('#welcome_frame').html("Welcome new user");
+              } else {
+                $('#welcome_frame').html("Welcome back!");
+              }
+              initialiseInfoFrameCloseFunctionality();
+              return $('#timer_view_link').removeData("loading");
             },
             error: function(h, response) {}
           });
@@ -58,7 +67,7 @@
       return false;
     };
     initialisePageCalculator = function() {
-      var appliance, appliance_id, formatted_time, running_cost, timer, total_timestamp, unit_rate, updateTimer, wattage, _i, _len, _ref;
+      var appliance, appliance_id, calculatorTimer, running_cost, timer, total_timestamp, unit_rate, updateCalculatorTimer, wattage, _i, _len, _ref;
       unit_rate = window.tariff.unit_rate;
       _ref = timerCollection.models;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -69,14 +78,13 @@
         if (timer.get('is_active') === 0) {
           total_timestamp = timer.get('total_timestamp');
           if (total_timestamp > 0) {
-            formatted_time = formatTimestamp(total_timestamp);
-            $('#' + timer.get('appliance_id') + '.time-display').html(formatted_time);
+            $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
             running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
-            $('#' + timer.get('appliance_id') + '.cost-display').html(running_cost);
+            $('#' + timer.get('appliance_id') + '.cost-display').html(formatCurrency(running_cost));
           }
         }
       }
-      updateTimer = function() {
+      updateCalculatorTimer = function() {
         var is_active, start_timestamp, total_cost, _j, _len1, _ref1;
         window.current_timestamp = (new Date).getTime();
         total_cost = parseFloat(window.tariff.standing_charge);
@@ -92,26 +100,26 @@
           if (is_active === 1) {
             start_timestamp = timer.get('start_timestamp');
             total_timestamp += current_timestamp - start_timestamp;
-            formatted_time = formatTimestamp(total_timestamp);
-            $('#' + timer.get('appliance_id') + '.time-display').html(formatted_time);
+            $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
           }
           running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
           total_cost += running_cost;
-          $('#' + timer.get('appliance_id') + '.cost-display').html(running_cost);
+          if (is_active === 1) {
+            $('#' + timer.get('appliance_id') + '.cost-display').html(formatCurrency(running_cost));
+          }
         }
         $('#total_cost').html(formatCurrency(total_cost));
         return console.log(total_cost);
       };
-      return $.timer(updateTimer, 200, true);
+      return calculatorTimer = $.timer(updateCalculatorTimer, 200, true);
     };
     initialiseTariffSelector = function() {
-      var tariffSelector;
-      tariffSelector = new TariffSelectorModel();
-      return tariffSelector.fetch({
+      window.tariffSelector = new TariffSelectorModel();
+      return window.tariffSelector.fetch({
         success: function(model, response) {
           var tariffSelectorView;
           tariffSelectorView = new TariffSelectorView({
-            model: tariffSelector
+            model: window.tariffSelector
           });
           $('#tariff_options_frame').html(tariffSelectorView.render(window.user).el);
           return tariffSelectorView.updateTariffData();
@@ -125,57 +133,121 @@
         user_id: window.user.get('user_id'),
         timestamp: timestamp
       };
-      return $.get('/comparisons/generate', data, function(response) {
+      return $.get('/comparisons/generate', data, function(response, callback) {
         comparisonCollection = new ComparisonCollection($.parseJSON(response));
         comparisonCollectionView = new ComparisonCollectionView({
           collection: comparisonCollection
         });
-        return $('#comparisons').html(comparisonCollectionView.render().el);
+        console.log("comparison collection ");
+        console.log(comparisonCollection.toJSON());
+        $('#summary_view_link').data("comparison_data", comparisonCollectionView.render().el);
+        return $('#summary_view_link').data("ready", true);
       });
     };
     $('document').ready(function() {
+      $('#reset_app_link').on({
+        'click': function(event) {
+          var choice, user_id;
+          choice = confirm('Would you like to start again?');
+          if (choice === true) {
+            user_id = window.user.get('user_id');
+            return $.post('/users/delete', {
+              user_id: user_id
+            }, function(response) {
+              $.removeCookie('user_id');
+              return window.location.href = '/';
+            });
+          }
+        }
+      });
+      $('#brand_frame').on({
+        'click': function(event) {
+          return window.location.href = "/";
+        }
+      });
       $('#timer_view_link').on({
         'click': function(event) {
-          if ($('#timer_view_template').length === 0) {
-            $.get("/views/fetch", {
-              view: 'timer'
-            }, function(template) {
-              var appliances;
-              $('#app_templates').append(template);
-              $('#page_container').append($(template).html());
-              appliances = applianceCollection.models;
-              $('#timer_gallery').html(timerCollectionView.render(appliances).el);
-              return initialisePageCalculator();
-            });
+          console.log($('#timer_view_link').data("loading"));
+          console.log($('#summary_view_link').data("loading"));
+          if ($('#timer_view_link').data("loading") || $('#summary_view_link').data("loading")) {
+            return false;
           } else {
-            if (current_page === "summary") {
-              summary_view = $('#summary_view').detach();
-              $('#page_container').append(timer_view);
+            $('#timer_view_link').data("loading", true);
+            if ($('#timer_view_template').length === 0) {
+              $.get("/views/fetch", {
+                view: 'timer'
+              }, function(template) {
+                var appliances;
+                $('#app_templates').append(template);
+                $('#page_container').append($(template).html());
+                appliances = applianceCollection.models;
+                $('#timer_gallery').html(timerCollectionView.render(appliances).el);
+                initialisePageCalculator();
+                return $('#timer_view_link').removeData("loading");
+              });
+            } else {
+              if (current_page === "summary") {
+                summary_view = $('#summary_view').detach();
+                $('#page_container').append(timer_view);
+              }
+              $('#timer_view_link').removeData("loading");
             }
+            current_page = "timer";
+            return false;
           }
-          current_page = "timer";
-          return false;
         }
       });
       $('#summary_view_link').on({
         'click': function(event) {
-          if ($('#summary_view_template').length === 0) {
-            $.get("/views/fetch", {
-              view: 'summary'
-            }, function(template) {
-              $('#app_templates').append(template);
-              timer_view = $('#timer_view').detach();
-              return $('#page_container').append($(template).html());
-            });
+          var summaryTimer, updateSummaryTimer;
+          if ($('#summary_view_link').data("loading") || $('#timer_view_link').data("loading")) {
+            return false;
           } else {
-            if (current_page === "timer") {
-              timer_view = $('#timer_view').detach();
-              $('#page_container').append(summary_view);
+            if ($('#summary_view_template').length === 0) {
+              $.get("/views/fetch", {
+                view: 'summary'
+              }, function(template) {
+                var summaryTimer, updateSummaryTimer;
+                $('#app_templates').append(template);
+                updateSummaryTimer = function() {
+                  console.log($('#summary_view_link').data("ready"));
+                  if ($('#summary_view_link').data("ready") !== void 0) {
+                    current_page = "summary";
+                    timer_view = $('#timer_view').detach();
+                    $('#page_container').append($(template).html());
+                    $('#comparisons').html($('#summary_view_link').data('comparison_data'));
+                    $('#summary_view_link').removeData("ready");
+                    $('#summary_view_link').removeData("loading");
+                    $('#summary_view_link').removeData("comparison_data");
+                    return summaryTimer.stop();
+                  }
+                };
+                summaryTimer = $.timer(updateSummaryTimer, 200, true);
+                return calculateSummary();
+              });
+            } else {
+              if (current_page === "timer") {
+                updateSummaryTimer = function() {
+                  if ($('#summary_view_link').data("ready") !== void 0) {
+                    current_page = "summary";
+                    timer_view = $('#timer_view').detach();
+                    $('#page_container').append(summary_view);
+                    $('#comparisons').html($('#summary_view_link').data('comparison_data'));
+                    $('#summary_view_link').removeData("loading");
+                    $('#summary_view_link').removeData("ready");
+                    $('#summary_view_link').removeData("comparison_data");
+                    return summaryTimer.stop();
+                  }
+                };
+                summaryTimer = $.timer(updateSummaryTimer, 200, true);
+                calculateSummary();
+                $('#page_container').append(summary_view);
+              } else {
+                $('#summary_view_link').removeData("loading");
+              }
             }
+            return false;
           }
-          calculateSummary();
-          current_page = "summary";
-          return false;
         }
       });
       return $('#info_frame_link').on({
@@ -191,7 +263,7 @@
     return $.get("/views/fetch", {
       view: 'models'
     }, function(templates) {
-      var user_id;
+      var start_timestamp, user_id;
       $('#app_templates').append(templates);
       $('#app_container').append($('#info_frame_template').html());
       $('#info_frame_container').css('top', '-1000px');
@@ -210,11 +282,14 @@
       });
       window.user = new UserModel();
       if (typeof ($.cookie('user_id')) === 'undefined') {
-        return $.get("/users/generateId", function(response) {
+        start_timestamp = new Date().getTime();
+        return $.post("/users/create", {
+          start_timestamp: start_timestamp
+        }, function(response) {
           var cookie_data, user_id;
           user_id = $.parseJSON(response);
           cookie_data = {
-            expires: 1
+            expires: 3
           };
           $.cookie('user_id', user_id, cookie_data);
           window.user = new UserModel({
@@ -222,7 +297,7 @@
           });
           return window.user.fetch({
             success: function(model, response) {
-              fetchModels();
+              fetchModels(false);
               return initialiseTariffSelector();
             }
           });
@@ -235,7 +310,7 @@
         });
         return window.user.fetch({
           success: function(model, response) {
-            fetchModels();
+            fetchModels(true);
             return initialiseTariffSelector();
           }
         });

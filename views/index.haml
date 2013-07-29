@@ -13,6 +13,11 @@
 				:href => "http://fonts.googleapis.com/css?family=Cinzel"}
 		%link{:rel => "stylesheet",
 				:type => "text/css",
+				:href => "http://fonts.googleapis.com/css?family=Source+Sans+Pro"}
+		%link{:rel => "shortcut icon",
+				:href => "/img/favicon.ico"}
+		%link{:rel => "stylesheet",
+				:type => "text/css",
 				:href => "http://fonts.googleapis.com/css?family=Fredoka+One"}
 		%script{:type => "text/javascript",
 				:src => "/js/libs/underscore.js"}
@@ -54,7 +59,7 @@
 				#app_nav.span6
 					.row-fluid
 						.span5
-							#brand-frame
+							#brand_frame
 								.brand
 									%img{:src => "/img/titleimage.png"}
 						.span7
@@ -75,12 +80,14 @@
 					.row-fluid
 						#total_cost_frame.span8.pull-right
 							#total_cost.pull-right
-								&#163;36.21
+								
 					.row-fluid
 						#tariff_options_frame.span8.pull-right
 			#page_container.row-fluid.clearfix
 			#app_footer.row-fluid
-				.span2.pull-right
-					Reset app
-					
+				#reset_frame.span2.pull-right
+					%a{:href => '#',
+						:id => 'reset_app_link'}
+						Reset app?
+				#welcome_frame.span2.pull-right
 		#app_templates

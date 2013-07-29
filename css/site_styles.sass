@@ -1,5 +1,5 @@
 @mixin select
-	font-family : sans-serif
+	font-family : Fredoka One, sans-serif
 	font-size : 15px
 	color : #dddddd
 	line-height : 40px
@@ -12,7 +12,7 @@
 	box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
 	background-image : url('/img/downarrow.png')
 	background-repeat : no-repeat
-	background-color : #333333
+	background-color : #222222
 	
 	option :
 		line-height : 40px
@@ -51,7 +51,7 @@ body
 			min-width : 620px
 			.row-fluid
 				.span5
-					#brand-frame
+					#brand_frame
 						background-color : #181818
 						width : 200px
 						height : 100px
@@ -60,6 +60,7 @@ body
 						border-radius : 1px
 						-webkit-box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
 						box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
+						cursor : pointer
 						.brand
 							//font-family : poiret-one, sans-serif
 							//font-family : Cinzel, sans-serif
@@ -111,7 +112,7 @@ body
 			.row-fluid
 				#total_cost_frame
 					height : 50px
-					width : 350px
+					width : 280px
 					//background-color : #cccccc
 					margin-top : 10px
 					margin-right : 10px
@@ -144,7 +145,7 @@ body
 									width : 240px
 									&:focus
 										outline : none
-									background-position : 87% 40%
+									background-position : 88% 40%
 						#select_provider_frame
 							width : 150px
 							margin-left : 5px
@@ -156,7 +157,7 @@ body
 									@include select
 									&:focus
 										outline : none
-									background-position : 64% 40%
+									background-position : 63% 40%
 						#select_tariff_frame
 							margin-left : 5px
 							width : 128px
@@ -168,8 +169,23 @@ body
 									@include select
 									&:focus
 										outline : none
-									background-position : 48% 40%
-									
+									background-position : 47.5% 40%
+	#app_footer
+		#reset_frame
+			padding-top : 5px
+			padding-right : 5px
+			text-align : right
+			width : 80px
+			a
+				color : #555555
+				text-decoration : underline
+		#welcome_frame
+			width : 200px
+			padding-top : 5px
+			padding-right : 10px
+			text-align : right
+			color : #555555
+	
 	#info_frame_container
 		height : 100%
 		width : 100%
@@ -183,7 +199,7 @@ body
 			top : 80px
 			width : 1000px
 			height : 400px
-			background-color : #333333
+			background-color : #222222
 			position : relative
 			margin-left : auto
 			margin-right : auto

@@ -1,17 +1,11 @@
 %script{:type => "text/template", :id => "summary_view_template"}
 	#summary_view
 		.row-fluid
-			.span12
+			#summary_frame.span12
 				.row-fluid
 					.span12#usage_overview
 						.row-fluid
-							.span3#summary
-								.row-fluid
-									.span12
-										%h5
-											Summary
-											<%= tariff_comparison[0] %>
-							.span9#savings
+							.span12#savings
 								.row-fluid
 									.span12
 										%h5
