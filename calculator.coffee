@@ -144,7 +144,16 @@ exports.calculateComparisons = (data) ->
 		if tariff.tariff_spend < user_spend.tariff_spend
 			appliance_usages = Array()
 			
-			reduction_fraction = (parseFloat(tariff.tariff_spend) - parseFloat(user_tariff.standing_charge)) /(parseFloat(user_spend.tariff_spend) - parseFloat(user_tariff.standing_charge))
+			console.log "tariff spend : "+parseFloat(tariff.tariff_spend)
+			console.log "user_tariff standing charge : "+parseFloat(user_tariff.standing_charge)
+			console.log "user_spend tariff_spend : "+parseFloat(user_spend.tariff_spend)
+			console.log "user tariff standing charge : "+parseFloat(user_tariff.standing_charge)
+			
+			if tariff.tariff_spend - user_tariff.standing_charge <= 0
+				reduction_fraction = 1
+			else
+				reduction_fraction = (parseFloat(tariff.tariff_spend) - parseFloat(user_tariff.standing_charge)) /(parseFloat(user_spend.tariff_spend) - parseFloat(user_tariff.standing_charge))
+			
 			_.each timer_data, (timer) ->
 			
 				#spend = _.map _.find appliance_spend, (spend) ->

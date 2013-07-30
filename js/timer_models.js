@@ -16,37 +16,50 @@
       tagName: 'li',
       template1: _.template($('#app_timer').html()),
       events: {
-        'click .button': 'timerToggle'
+        'click .button': 'timerToggle',
+        'click .turn-off': 'switchOff'
       },
-      timerToggle: function() {
-        var appliance_id, data, is_active, start_timestamp, timer, timestamp, total_timestamp;
+      switchOff: function() {
+        var is_active;
         is_active = this.model.get('is_active');
         if (is_active === 1) {
-          timestamp = window.current_timestamp;
-          start_timestamp = this.model.get('start_timestamp');
-          total_timestamp = this.model.get('total_timestamp');
-          total_timestamp += timestamp - start_timestamp;
-          this.model.set('total_timestamp', total_timestamp);
-          this.model.set('start_timestamp', '');
-        } else {
-          timestamp = (new Date).getTime();
-          this.model.set('start_timestamp', timestamp);
+          return this.timerToggle();
         }
-        appliance_id = this.model.get('appliance_id');
-        this.animatePress(appliance_id, is_active, 200);
-        data = {
-          appliance_id: appliance_id,
-          is_active: this.model.get('is_active'),
-          user_id: window.user.get('user_id'),
-          timestamp: timestamp
-        };
-        timer = this;
-        return $.post('/timer/storeTimestamp', data, function(response) {
-          response = JSON.parse(response);
-          console.log("IS_ACTIVE " + response.is_active);
-          timer.model.set('is_active', response.is_active);
-          return timer.animateColor(appliance_id, response.is_active, 200);
-        });
+      },
+      timerToggle: function() {
+        var appliance_id, data, is_active, timer, timestamp;
+        if ($('#app_container').data('complete') === false) {
+          is_active = this.model.get('is_active');
+          timestamp = (new Date).getTime();
+          if (is_active === 1) {
+            timestamp = window.current_timestamp;
+          }
+          appliance_id = this.model.get('appliance_id');
+          this.animatePress(appliance_id, is_active, 200);
+          data = {
+            appliance_id: appliance_id,
+            is_active: this.model.get('is_active'),
+            user_id: window.user.get('user_id'),
+            timestamp: timestamp
+          };
+          timer = this;
+          return $.post('/timer/storeTimestamp', data, function(response) {
+            var start_timestamp, total_timestamp;
+            response = JSON.parse(response);
+            console.log("IS_ACTIVE " + response.is_active);
+            if (response.is_active === 0) {
+              start_timestamp = timer.model.get('start_timestamp');
+              total_timestamp = timer.model.get('total_timestamp');
+              total_timestamp += timestamp - start_timestamp;
+              timer.model.set('total_timestamp', total_timestamp);
+              timer.model.set('start_timestamp', '');
+            } else {
+              timer.model.set('start_timestamp', timestamp);
+            }
+            timer.model.set('is_active', response.is_active);
+            return timer.animateColor(appliance_id, response.is_active, 200);
+          });
+        }
       },
       animatePress: function(appliance_id, is_active, timeframe) {
         var button;

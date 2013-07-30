@@ -39,6 +39,8 @@ window.initialiseTariffSelectorModel = ->
 			tariff_id = _.first _.map provided_tariffs, (tariff) ->
 				return tariff.tariff_id
 			
+			#alert "region_id is "+region_id+", provider_id is "+provider_id+", tariff_id is "+tariff_id
+			
 			window.user.set
 				region_id : region_id
 				provider_id : provider_id
@@ -82,7 +84,7 @@ window.initialiseTariffSelectorModel = ->
 			tariff_data = this.model.get 'tariff_data'
 			tariff_id = window.user.get 'tariff_id'
 			#console.log "THE tariff_id "+tariff_id
-			window.tariff = _.first _.filter tariff_data, (tariff) ->
+			window.tariff = _.find tariff_data, (tariff) ->
 				#console.log tariff.tariff_id
 				return tariff.tariff_id == tariff_id
 			#$('#total_cost').html '&#163;'+window.tariff.unit_rate

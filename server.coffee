@@ -3,26 +3,39 @@
 express = require 'express'
 fs = require 'fs'
 http = require 'http'
-socket = require 'socket.io'
 _ = require 'underscore'
+
+config_db = ""
+config_username = ""
+config_password = ""
+config_host = ""
 
 database = require './custom_modules/database'
 calculator = require './custom_modules/calculator'
 user_id_generator = require './custom_modules/user_id_generator'
-config = require './custom_modules/config'
 
 #console.log config.data.host
 if process.env.VCAP_SERVICES
 	env = JSON.parse process.env.VCAP_SERVICES
 	config = env['mysql-5.1'][0]['credentials']
-	database.connect config.hostname, config.username, config.password, config.db
+	#database.connect config.hostname, config.username, config.password, config.db
+	config_db = config.db
+	config_username = config.username
+	config_password = config.password
+	config_host = config.hostname
 else
-	database.connect config.data.host, config.data.username, config.data.password, config.data.database
+	config = require './custom_modules/config'
+	#database.connect config.data.host, config.data.username, config.data.password, config.data.database
+	config_db = config.data.database
+	config_username = config.data.username
+	config_password = config.data.password
+	config_host = config.data.host
+	
+database.createConnection config_host, config_username, config_password, config_db
 
 app = express()
 app.use require('connect').bodyParser()
 server = http.createServer app
-io = socket.listen server
 #server.listen (config.data.port || process.env.VCAP_APP_PORT)
 server.listen (process.env.VCAP_APP_PORT || 3000)
 
@@ -75,16 +88,16 @@ app.get '/fonts/:file', (request, response) ->
 	response.end()
 	
 app.get '/appliances/fetch', (request, response) ->
-
 	database.getAppliances (appliances) ->
+		
 		response.writeHead 200, 
 			'Access-Control-Allow-Origin' : '*'
 		response.write JSON.stringify(appliances)
 		response.end()
 		
 app.get '/appliance_usage/fetch', (request, response) ->
-
 	database.getApplianceUsage (request.query.user_id), (appliance_usage) ->
+	
 		response.writeHead 200, 
 			'Access-Control-Allow-Origin' : '*'
 		response.write JSON.stringify(appliance_usage)
@@ -114,6 +127,7 @@ app.get '/views/fetch', (request, response) ->
 		
 app.get '/timers/fetch', (request, response) ->
 	database.getTimers (request.query.user_id), (timers) ->
+
 		response.writeHead 200, 
 			'Access-Control-Allow-Origin' : '*'
 		timer_data = calculator.calculateTerminatedUsage timers
@@ -142,17 +156,20 @@ app.post '/timer/storeTimestamp', (request, response) ->
 	
 	#timestamp = new Date().getTime()
 	timestamp = request.body.timestamp
+	if request.body.timestamp == undefined
+		timestamp = new Date().getTime() #may not be the right time but better than undefined
 	appliance_id = request.body.appliance_id
 	is_active = request.body.is_active
 	is_active = (parseInt(is_active) + 1) % 2
 	user_id = request.body.user_id
-	database.appendTimeStamp user_id, appliance_id, is_active, timestamp
+	
+	database.appendTimeStamp user_id, appliance_id, is_active, timestamp, (status) ->
+
+		data =
+			is_active : is_active
 		
-	data =
-		is_active : is_active
-		
-	response.write JSON.stringify data
-	response.end()
+		response.write JSON.stringify data
+		response.end()
 
 app.all '/users/save', (request, response) ->
 	response.writeHead 200, 
@@ -176,17 +193,22 @@ app.all '/users/delete', (request, response) ->
 	
 	user_id = request.body.user_id
 	console.log request.body
+
 	database.deleteUserData user_id, (status) ->
+
 		response.write JSON.stringify status
 		response.end()
 	
 app.all '/users/create', (request, response) ->
+	console.log "creating user"
 	response.writeHead 200,
 		'Access-Control-Allow-Origin' : '*'
 	user_id = user_id_generator.generate()
 	start_timestamp = request.body.start_timestamp
-	user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
+	#user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
+
 	database.createUserData user_id, start_timestamp, (status) ->
+
 		response.write JSON.stringify user_id
 		response.end()
 
@@ -195,7 +217,9 @@ app.get '/users/fetch/:user_id', (request, response) ->
 		'Access-Control-Allow-Origin' : '*'
 	console.log "erere?"
 	user_id = request.params.user_id
+
 	database.getUserData (user_id), (user_data) ->
+
 		response.write JSON.stringify user_data[0]
 		response.end()
 	
@@ -212,7 +236,6 @@ app.get '/comparisons/generate', (request, response) ->
 			database.getAppliances (appliance_data) ->
 				database.getUserData (user_id), (user_data) ->
 					database.getTariffData (user_data.region_id), (tariff_data) ->
-				
 						#console.log "user_id is "+user_id
 				
 						timer_data = calculator.calculateTerminatedUsage(timers)

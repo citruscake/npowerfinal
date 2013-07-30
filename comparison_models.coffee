@@ -24,7 +24,10 @@ window.initialiseComparisonModels = (SERVER_ROOT, socket) ->
 	window.ComparisonCollectionView = Backbone.View.extend
 		tagName : 'ul'
 		render : ->
-			this.collection.forEach this.renderComparison, this
+			if this.collection.length != 0
+				this.collection.forEach this.renderComparison, this
+			else
+				this.$el.append "<li><h3>No cheaper tariffs found yet- you're a saving star!</h3></li>"
 			return this
 		renderComparison : (comparison) ->
 			console.log comparison

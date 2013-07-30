@@ -30,7 +30,11 @@
     return window.ComparisonCollectionView = Backbone.View.extend({
       tagName: 'ul',
       render: function() {
-        this.collection.forEach(this.renderComparison, this);
+        if (this.collection.length !== 0) {
+          this.collection.forEach(this.renderComparison, this);
+        } else {
+          this.$el.append("<li><h3>No cheaper tariffs found yet- you're a saving star!</h3></li>");
+        }
         return this;
       },
       renderComparison: function(comparison) {

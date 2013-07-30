@@ -96,9 +96,9 @@
         var tariff_data, tariff_id;
         tariff_data = this.model.get('tariff_data');
         tariff_id = window.user.get('tariff_id');
-        return window.tariff = _.first(_.filter(tariff_data, function(tariff) {
+        return window.tariff = _.find(tariff_data, function(tariff) {
           return tariff.tariff_id === tariff_id;
-        }));
+        });
       },
       render: function(user_data) {
         var attributes;

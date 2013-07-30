@@ -1,5 +1,5 @@
 (function() {
-  var app, calculator, config, database, env, express, fs, http, io, server, socket, user_id_generator, _;
+  var app, calculator, config, config_db, config_host, config_password, config_username, database, env, express, fs, http, server, user_id_generator, _;
 
   express = require('express');
 
@@ -7,9 +7,15 @@
 
   http = require('http');
 
-  socket = require('socket.io');
-
   _ = require('underscore');
+
+  config_db = "";
+
+  config_username = "";
+
+  config_password = "";
+
+  config_host = "";
 
   database = require('./custom_modules/database');
 
@@ -17,23 +23,28 @@
 
   user_id_generator = require('./custom_modules/user_id_generator');
 
-  config = require('./custom_modules/config');
-
   if (process.env.VCAP_SERVICES) {
     env = JSON.parse(process.env.VCAP_SERVICES);
     config = env['mysql-5.1'][0]['credentials'];
-    database.connect(config.hostname, config.username, config.password, config.db);
+    config_db = config.db;
+    config_username = config.username;
+    config_password = config.password;
+    config_host = config.hostname;
   } else {
-    database.connect(config.data.host, config.data.username, config.data.password, config.data.database);
+    config = require('./custom_modules/config');
+    config_db = config.data.database;
+    config_username = config.data.username;
+    config_password = config.data.password;
+    config_host = config.data.host;
   }
+
+  database.createConnection(config_host, config_username, config_password, config_db);
 
   app = express();
 
   app.use(require('connect').bodyParser());
 
   server = http.createServer(app);
-
-  io = socket.listen(server);
 
   server.listen(process.env.VCAP_APP_PORT || 3000);
 
@@ -182,23 +193,28 @@
   });
 
   app.post('/timer/storeTimestamp', function(request, response) {
-    var appliance_id, data, is_active, timestamp, user_id;
+    var appliance_id, is_active, timestamp, user_id;
     response.writeHead(200, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'POST',
       'Access-Control-Allow-Headers': 'Content-Type'
     });
     timestamp = request.body.timestamp;
+    if (request.body.timestamp === void 0) {
+      timestamp = new Date().getTime();
+    }
     appliance_id = request.body.appliance_id;
     is_active = request.body.is_active;
     is_active = (parseInt(is_active) + 1) % 2;
     user_id = request.body.user_id;
-    database.appendTimeStamp(user_id, appliance_id, is_active, timestamp);
-    data = {
-      is_active: is_active
-    };
-    response.write(JSON.stringify(data));
-    return response.end();
+    return database.appendTimeStamp(user_id, appliance_id, is_active, timestamp, function(status) {
+      var data;
+      data = {
+        is_active: is_active
+      };
+      response.write(JSON.stringify(data));
+      return response.end();
+    });
   });
 
   app.all('/users/save', function(request, response) {
@@ -235,12 +251,12 @@
 
   app.all('/users/create', function(request, response) {
     var start_timestamp, user_id;
+    console.log("creating user");
     response.writeHead(200, {
       'Access-Control-Allow-Origin': '*'
     });
     user_id = user_id_generator.generate();
     start_timestamp = request.body.start_timestamp;
-    user_id = '2a550081-364e-4aa5-b438-4b21f60c158e';
     return database.createUserData(user_id, start_timestamp, function(status) {
       response.write(JSON.stringify(user_id));
       return response.end();

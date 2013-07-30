@@ -12,6 +12,8 @@ $ ->
 	window.user = null
 	window.tariff = null
 	current_page = null
+	
+	$('#app_container').data('complete', false)
 	$('#timer_view_link').data("loading") 
 	
 	in_use = $.cookie 'in_use'
@@ -27,7 +29,7 @@ $ ->
 	
 	#window.user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
 			
-	fetchModels = (existing_user) ->
+	fetchModels = () ->
 
 		applianceCollection.fetch
 			success : (collection,response) ->
@@ -36,30 +38,47 @@ $ ->
 					data :
 						user_id : window.user.get 'user_id'
 					success : (collection,response) ->
+						$('#app_container').append "<div id=\"info_frame_container\"></div>"
+						$('#info_frame_container').html _.template $('#info_frame_template').html()
+						$('#info_frame_container').css 'top', '-1000px'
 						timerCollection.addDummyTimers applianceCollection.models
 						$('#timer_view_link').trigger 'click'
 						current_page = "timer"
-						if existing_user == false
+						if window.existing_user == false
 							$('#info_frame_link').trigger 'click'
 							$('#welcome_frame').html "Welcome new user"
 						else
 							$('#welcome_frame').html "Welcome back!"
+						console.log window.user
 						initialiseInfoFrameCloseFunctionality()
 						$('#timer_view_link').removeData("loading")
 					error : (h,response) ->	
 			error : (h,response) ->
 			
 	initialiseInfoFrameCloseFunctionality = ->		
+		
+		
+		#$('#info_frame_container').on 'click', '#go_link_frame' : (event) ->
+		#	$('#info_frame_container').trigger 'click'
+			#$('#info_frame_container').animate
+			#	opacity : 0
+			#, 200, 'easeOutSine'
+			#, ->
+			#	$('#info_frame_container').css 'top', '-1000px'
+			#	$('body').css "overflow", "visible"
 			
-		$('#info_frame_close_link').on 'click' : (event) ->
+		$('#info_frame_container').on 'click', '#info_frame_close_link,#go_link_frame', (event) ->
+			$('#info_frame_container').css 'top', '-1000px'
+			if (window.existing_user == false) 
+				window.existing_user = true
+				$('#info_frame_container').html _.template $('#info_frame_template').html()
 			$('#info_frame_container').animate
 				opacity : 0
 			, 200, 'easeOutSine'
 			, ->
-				$('#info_frame_container').css 'top', '-1000px'
 				$('body').css "overflow", "visible"
 			
-		return false
+		#return false
 	
 	initialisePageCalculator = ->
 
@@ -76,12 +95,32 @@ $ ->
 					#formatted_time = formatTimestamp total_timestamp
 					$('#'+timer.get('appliance_id')+'.time-display').html formatTimestamp total_timestamp
 					running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
-					$('#'+timer.get('appliance_id')+'.cost-display').html formatCurrency running_cost
+					#$('#'+timer.get('appliance_id')+'.cost-display').html formatCurrency running_cost
+					
+					currency_string = formatCurrency running_cost, 4
+					pence_fraction = currency_string.slice -2
+					currency_string = currency_string.substr(0, currency_string.length-2)
+					$('#'+timer.get('appliance_id')+'.cost-display').html currency_string+"<span class=\"pence-fraction\">."+pence_fraction+"</span>"
+					#$('#'+timer.get('appliance_id')+'.pence-fraction-display').html formatCurrency running_cost, true
 	
 		updateCalculatorTimer = ->
 			window.current_timestamp = (new Date).getTime()
 			total_cost = parseFloat window.tariff.standing_charge
 			#console.log "total_cost is "+window.tariff.standing_charge
+			
+			days = (window.current_timestamp - parseFloat(window.user.get 'start_timestamp')) / (60*60*1000*24)
+			minutes = (window.current_timestamp - parseFloat(window.user.get 'start_timestamp')) / (60*1000)
+			#if minutes > 2 && $('#app_container').data('complete') == false
+			if days > 1 && $('#app_container').data('complete') == false
+			#	#time to end it
+				$('#info_frame_container').html $('#info_frame_end_template').html()
+				$('#info_frame_link').trigger 'click'
+				$('.turn-off').trigger 'click'
+				$('#app_container').data 'complete', true
+				
+				$.removeCookie 'user_id'
+				
+			console.log minutes
 			
 			unit_rate = window.tariff.unit_rate
 			for timer in timerCollection.models
@@ -91,20 +130,25 @@ $ ->
 				is_active = timer.get 'is_active'
 				total_timestamp = timer.get('total_timestamp')
 				
+				start_timestamp = timer.get 'start_timestamp'
 				if is_active == 1
-					start_timestamp = timer.get 'start_timestamp'
+					#start_timestamp = timer.get 'start_timestamp'
 					total_timestamp += current_timestamp - start_timestamp
+					console.log "total_timestamp "+total_timestamp
 					$('#'+timer.get('appliance_id')+'.time-display').html formatTimestamp total_timestamp
 				
 				running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
 				total_cost += running_cost
 				#console.log "adding "+running_cost
 				
-				if is_active == 1
-					$('#'+timer.get('appliance_id')+'.cost-display').html formatCurrency running_cost
+				#if is_active == 1
+				if parseFloat(total_timestamp) > 0 || parseFloat(start_timestamp) > 0
+					currency_string = formatCurrency running_cost, 4
+					pence_fraction = currency_string.slice -2
+					currency_string = currency_string.substr(0, currency_string.length-2)
+					$('#'+timer.get('appliance_id')+'.cost-display').html currency_string+"<span class=\"pence-fraction\">."+pence_fraction+"</span>"
 					
 			$('#total_cost').html formatCurrency total_cost
-			console.log total_cost
 			
 		calculatorTimer = $.timer(updateCalculatorTimer, 200, true)
 	
@@ -222,6 +266,7 @@ $ ->
 				return false
 		
 		$('#info_frame_link').on 'click' : (event) ->
+							
 			$('#info_frame_container').css 'top', '0px'
 			$('body').css "overflow", "hidden"
 			$('#info_frame_container').animate
@@ -232,9 +277,6 @@ $ ->
 	$.get "/views/fetch", { view : 'models' }, (templates) ->
 						
 		$('#app_templates').append templates		
-
-		$('#app_container').append $('#info_frame_template').html()
-		$('#info_frame_container').css 'top', '-1000px'
 		
 		initialiseApplianceModels()
 		initialiseTimerModels()
@@ -255,6 +297,7 @@ $ ->
 		#$.removeCookie 'user_id'
 			
 		if typeof($.cookie 'user_id') == 'undefined'
+			window.existing_user = false
 			start_timestamp = new Date().getTime()
 			$.post "/users/create", {start_timestamp : start_timestamp}, (response) ->
 				user_id = $.parseJSON response
@@ -265,10 +308,11 @@ $ ->
 					user_id : user_id
 				window.user.fetch
 					success : (model,response) ->
-						fetchModels(false)
+						fetchModels()
 						initialiseTariffSelector()
 		else
 			user_id = $.cookie 'user_id'
+			window.existing_user = true
 			#alert "welcome back "+user_id
 			#window.user_id = user_id
 			$.cookie('user_id').expires = 1

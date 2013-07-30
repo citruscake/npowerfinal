@@ -13,6 +13,7 @@
     window.user = null;
     window.tariff = null;
     current_page = null;
+    $('#app_container').data('complete', false);
     $('#timer_view_link').data("loading");
     in_use = $.cookie('in_use');
     if (in_use === 'true') {
@@ -26,7 +27,7 @@
       $.removeCookie('in_use');
       return null;
     };
-    fetchModels = function(existing_user) {
+    fetchModels = function() {
       return applianceCollection.fetch({
         success: function(collection, response) {
           console.log(applianceCollection.models);
@@ -35,15 +36,19 @@
               user_id: window.user.get('user_id')
             },
             success: function(collection, response) {
+              $('#app_container').append("<div id=\"info_frame_container\"></div>");
+              $('#info_frame_container').html(_.template($('#info_frame_template').html()));
+              $('#info_frame_container').css('top', '-1000px');
               timerCollection.addDummyTimers(applianceCollection.models);
               $('#timer_view_link').trigger('click');
               current_page = "timer";
-              if (existing_user === false) {
+              if (window.existing_user === false) {
                 $('#info_frame_link').trigger('click');
                 $('#welcome_frame').html("Welcome new user");
               } else {
                 $('#welcome_frame').html("Welcome back!");
               }
+              console.log(window.user);
               initialiseInfoFrameCloseFunctionality();
               return $('#timer_view_link').removeData("loading");
             },
@@ -54,20 +59,21 @@
       });
     };
     initialiseInfoFrameCloseFunctionality = function() {
-      $('#info_frame_close_link').on({
-        'click': function(event) {
-          return $('#info_frame_container').animate({
-            opacity: 0
-          }, 200, 'easeOutSine', function() {
-            $('#info_frame_container').css('top', '-1000px');
-            return $('body').css("overflow", "visible");
-          });
+      return $('#info_frame_container').on('click', '#info_frame_close_link,#go_link_frame', function(event) {
+        $('#info_frame_container').css('top', '-1000px');
+        if (window.existing_user === false) {
+          window.existing_user = true;
+          $('#info_frame_container').html(_.template($('#info_frame_template').html()));
         }
+        return $('#info_frame_container').animate({
+          opacity: 0
+        }, 200, 'easeOutSine', function() {
+          return $('body').css("overflow", "visible");
+        });
       });
-      return false;
     };
     initialisePageCalculator = function() {
-      var appliance, appliance_id, calculatorTimer, running_cost, timer, total_timestamp, unit_rate, updateCalculatorTimer, wattage, _i, _len, _ref;
+      var appliance, appliance_id, calculatorTimer, currency_string, pence_fraction, running_cost, timer, total_timestamp, unit_rate, updateCalculatorTimer, wattage, _i, _len, _ref;
       unit_rate = window.tariff.unit_rate;
       _ref = timerCollection.models;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -80,14 +86,27 @@
           if (total_timestamp > 0) {
             $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
             running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
-            $('#' + timer.get('appliance_id') + '.cost-display').html(formatCurrency(running_cost));
+            currency_string = formatCurrency(running_cost, 4);
+            pence_fraction = currency_string.slice(-2);
+            currency_string = currency_string.substr(0, currency_string.length - 2);
+            $('#' + timer.get('appliance_id') + '.cost-display').html(currency_string + "<span class=\"pence-fraction\">." + pence_fraction + "</span>");
           }
         }
       }
       updateCalculatorTimer = function() {
-        var is_active, start_timestamp, total_cost, _j, _len1, _ref1;
+        var days, is_active, minutes, start_timestamp, total_cost, _j, _len1, _ref1;
         window.current_timestamp = (new Date).getTime();
         total_cost = parseFloat(window.tariff.standing_charge);
+        days = (window.current_timestamp - parseFloat(window.user.get('start_timestamp'))) / (60 * 60 * 1000 * 24);
+        minutes = (window.current_timestamp - parseFloat(window.user.get('start_timestamp'))) / (60 * 1000);
+        if (days > 1 && $('#app_container').data('complete') === false) {
+          $('#info_frame_container').html($('#info_frame_end_template').html());
+          $('#info_frame_link').trigger('click');
+          $('.turn-off').trigger('click');
+          $('#app_container').data('complete', true);
+          $.removeCookie('user_id');
+        }
+        console.log(minutes);
         unit_rate = window.tariff.unit_rate;
         _ref1 = timerCollection.models;
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -97,19 +116,22 @@
           wattage = appliance.get('wattage');
           is_active = timer.get('is_active');
           total_timestamp = timer.get('total_timestamp');
+          start_timestamp = timer.get('start_timestamp');
           if (is_active === 1) {
-            start_timestamp = timer.get('start_timestamp');
             total_timestamp += current_timestamp - start_timestamp;
+            console.log("total_timestamp " + total_timestamp);
             $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
           }
           running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
           total_cost += running_cost;
-          if (is_active === 1) {
-            $('#' + timer.get('appliance_id') + '.cost-display').html(formatCurrency(running_cost));
+          if (parseFloat(total_timestamp) > 0 || parseFloat(start_timestamp) > 0) {
+            currency_string = formatCurrency(running_cost, 4);
+            pence_fraction = currency_string.slice(-2);
+            currency_string = currency_string.substr(0, currency_string.length - 2);
+            $('#' + timer.get('appliance_id') + '.cost-display').html(currency_string + "<span class=\"pence-fraction\">." + pence_fraction + "</span>");
           }
         }
-        $('#total_cost').html(formatCurrency(total_cost));
-        return console.log(total_cost);
+        return $('#total_cost').html(formatCurrency(total_cost));
       };
       return calculatorTimer = $.timer(updateCalculatorTimer, 200, true);
     };
@@ -265,8 +287,6 @@
     }, function(templates) {
       var start_timestamp, user_id;
       $('#app_templates').append(templates);
-      $('#app_container').append($('#info_frame_template').html());
-      $('#info_frame_container').css('top', '-1000px');
       initialiseApplianceModels();
       initialiseTimerModels();
       initialiseComparisonModels();
@@ -282,6 +302,7 @@
       });
       window.user = new UserModel();
       if (typeof ($.cookie('user_id')) === 'undefined') {
+        window.existing_user = false;
         start_timestamp = new Date().getTime();
         return $.post("/users/create", {
           start_timestamp: start_timestamp
@@ -297,13 +318,14 @@
           });
           return window.user.fetch({
             success: function(model, response) {
-              fetchModels(false);
+              fetchModels();
               return initialiseTariffSelector();
             }
           });
         });
       } else {
         user_id = $.cookie('user_id');
+        window.existing_user = true;
         $.cookie('user_id').expires = 1;
         window.user = new UserModel({
           user_id: user_id

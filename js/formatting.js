@@ -37,8 +37,13 @@
     return formatted_time;
   };
 
-  window.formatCurrency = function(amount) {
-    return "&#163;" + String(amount.toFixed(2));
+  window.formatCurrency = function(amount, toFixed) {
+    var currency_string;
+    if (toFixed == null) {
+      toFixed = 2;
+    }
+    currency_string = "&#163;" + String(amount.toFixed(toFixed));
+    return currency_string;
   };
 
 }).call(this);

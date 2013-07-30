@@ -1,22 +1,28 @@
 (function() {
-  var connection, mysql;
+  var connection, database, host, mysql, password, user;
 
   mysql = require('mysql');
 
   connection = "";
 
-  exports.connect = function(host, user, password, database) {
-    console.log(host, user, password, database);
-    connection = mysql.createConnection({
+  host = "";
+
+  user = "";
+
+  password = "";
+
+  database = "";
+
+  exports.createConnection = function(_host, _user, _password, _database) {
+    host = _host;
+    user = _user;
+    password = _password;
+    database = _database;
+    return connection = mysql.createConnection({
       host: host,
       user: user,
       password: password,
       database: database
-    });
-    return connection.connect(function(error) {
-      if (error) {
-        throw error;
-      }
     });
   };
 
@@ -52,8 +58,8 @@
   };
 
   exports.createUserData = function(user_id, start_timestamp, callback) {
-    console.log("INSERT INTO users VALUES ('" + user_id + "', '" + start_timestamp + "', 10, 1, 1)");
-    return connection.query("INSERT INTO users VALUES ('" + user_id + "', '" + start_timestamp + "', 10, 1, 1)", function(error, rows, fields) {
+    console.log("INSERT INTO users VALUES ('" + user_id + "', '" + start_timestamp + "', 11, 1, 6)");
+    return connection.query("INSERT INTO users VALUES ('" + user_id + "', '" + start_timestamp + "', 11, 1, 6)", function(error, rows, fields) {
       if (error) {
         throw error;
       } else {
@@ -153,15 +159,18 @@
         throw error;
       }
       if (rows[0].count > 0) {
-        console.log("here with " + user_id);
         connection.query("SELECT timestamp_string FROM timers WHERE user_id = '" + user_id + "' AND appliance_id = " + appliance_id, function(error, rows, fields) {
           var timestamp_string;
-          timestamp_string = rows[0].timestamp_string + "," + timestamp;
-          return connection.query("UPDATE timers SET timestamp_string = '" + timestamp_string + "', is_active = " + is_active + " WHERE user_id = '" + user_id + "' AND appliance_id = '" + appliance_id + "'", function(error, rows, fields) {
-            if (error) {
-              throw error;
-            }
-          });
+          if (error) {
+            throw error;
+          } else {
+            timestamp_string = rows[0].timestamp_string + "," + timestamp;
+            return connection.query("UPDATE timers SET timestamp_string = '" + timestamp_string + "', is_active = " + is_active + " WHERE user_id = '" + user_id + "' AND appliance_id = '" + appliance_id + "'", function(error, rows, fields) {
+              if (error) {
+                throw error;
+              }
+            });
+          }
         });
       } else {
         connection.query("INSERT INTO timers VALUES ('" + user_id + "'," + appliance_id + ",1," + timestamp + ")", function(error, rows, fields) {
@@ -171,10 +180,8 @@
           }
         });
       }
-      callback;
+      callback("success");
     });
   };
-
-  exports.save = function(model, data) {};
 
 }).call(this);

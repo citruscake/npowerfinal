@@ -14,35 +14,48 @@ window.initialiseTimerModels = ->
 		template1 : _.template $('#app_timer').html()
 		events : 
 			'click .button' : 'timerToggle'
-		timerToggle : ->
+			'click .turn-off' : 'switchOff'
+			
+		switchOff : ->
+			
 			is_active = this.model.get 'is_active'
 			if is_active == 1
-				timestamp = window.current_timestamp
-				start_timestamp = this.model.get 'start_timestamp'
-				total_timestamp = this.model.get 'total_timestamp'
-				total_timestamp += timestamp - start_timestamp
-				this.model.set 'total_timestamp', total_timestamp
-				this.model.set 'start_timestamp', ''
-			else
+				this.timerToggle()
+			
+		timerToggle : ->
+			if $('#app_container').data('complete') == false
+				is_active = this.model.get 'is_active'
 				timestamp = (new Date).getTime()
-				this.model.set 'start_timestamp', timestamp
+				if is_active == 1
+					timestamp = window.current_timestamp
 			
-			appliance_id = this.model.get 'appliance_id' #
+				appliance_id = this.model.get 'appliance_id' #
 			
-			this.animatePress appliance_id, is_active, 200
+				this.animatePress appliance_id, is_active, 200
 			
-			data = 
-				appliance_id : appliance_id
-				is_active : this.model.get 'is_active'
-				user_id : window.user.get 'user_id'
-				timestamp : timestamp
-			timer = this
-			
-			$.post '/timer/storeTimestamp', data, (response) ->
-				response = JSON.parse response
-				console.log "IS_ACTIVE "+response.is_active
-				timer.model.set 'is_active', response.is_active
-				timer.animateColor appliance_id, response.is_active, 200
+				data = 
+					appliance_id : appliance_id
+					is_active : this.model.get 'is_active'
+					user_id : window.user.get 'user_id'
+					timestamp : timestamp
+				timer = this
+				
+				$.post '/timer/storeTimestamp', data, (response) ->
+					response = JSON.parse response
+				#is_active = response.is_active
+					console.log "IS_ACTIVE "+response.is_active
+				
+					if response.is_active == 0
+						start_timestamp = timer.model.get 'start_timestamp'
+						total_timestamp = timer.model.get 'total_timestamp'
+						total_timestamp += timestamp - start_timestamp
+						timer.model.set 'total_timestamp', total_timestamp
+						timer.model.set 'start_timestamp', ''
+					else 
+						timer.model.set 'start_timestamp', timestamp
+				
+					timer.model.set 'is_active', response.is_active
+					timer.animateColor appliance_id, response.is_active, 200
 
 		animatePress : (appliance_id, is_active, timeframe) ->
 			button = $('#'+appliance_id+'.button')

@@ -3,7 +3,7 @@ window.formatTimestamp = (timestamp, toString=true) ->
 	formatted_hours = String time.getHours()
 	formatted_minutes = String time.getMinutes()
 	formatted_seconds = String time.getSeconds()
-	formatted_milliseconds = String time.getMilliseconds()		
+	formatted_milliseconds = String time.getMilliseconds()
 	
 	#if (formatted_hours.length) < 2 && toString == true
 		#formatted_hours = "0" + formatted_hours
@@ -43,5 +43,7 @@ window.formatTimestamp = (timestamp, toString=true) ->
 
 	return formatted_time
 		
-window.formatCurrency = (amount) ->
-	"&#163;" + String amount.toFixed(2)
+window.formatCurrency = (amount, toFixed=2) ->
+	currency_string = "&#163;"+String(amount.toFixed(toFixed))
+	#console.log currency_string
+	return currency_string

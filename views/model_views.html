@@ -38,6 +38,7 @@
             </div>
           </div>
         </div>
+        <div class='turn-off'></div>
       </div>
     </div>
   </div>
@@ -226,18 +227,87 @@
   </div>
 </script>
 <script id='info_frame_template' type='text/template'>
-  <div id='info_frame_container'>
-    <div id='info_frame'>
-      <div class='row-fluid'>
-        <div class='span12'></div>
-        Some information for you to start off.
-        <a href='#' id='info_frame_close_link'>
-          Close/ Go
-        </a>
+  <div id='info_frame'>
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div id='info_frame_logo'>
+          <img src='/img/titleimage.png'>
+        </div>
+        <!-- /%a{:href => '#', -->
+        <!-- /:id => 'info_frame_close_link'} -->
+        <!-- /	Close/ Go -->
+        <div id='info_box_1'>
+          <h3>
+            Welcome to the 24/365 challenge.
+          </h3>
+          <h4>
+            Your task is to record your energy use for 24 hours. By using our control panel, you can see how much you are spending, as your appliances are running. Simply select your region, provider &#38; tariff in the top right section of the screen, and your spending total will adjust to your tariff. Your initial total will be your tariff&#39;s standing charge.</br></br>
+            You turn an appliance&#39;s timer on or off by pressing the large grey button- you can&#39;t miss it&#33; By doing so you can see how much that appliance is costing you in real time.</br></br>
+            As for the &#39;365&#39; part of the challenge- by clicking &#39;My savings&#39; you can actually see how much your energy use would cost you yearly. </br></br>
+          </h4>
+        </div>
+        <div id='info_box_2'>
+          <h4>
+            The savings can be quite substantial- and if you are lucky, there will be alternative tariffs in your region which will shrink your bill without you having to reduce your usage.</br></br>
+            Simply return to this webpage at any point during the challenge period and you can carry on as before.</br></br>
+            This app requires the use of cookies to run, but no personally identifiable information is obtained.</br></br>
+          </h4>
+          <% if(window.existing_user == false) { %>
+          	<h3>Ok, are you ready? The challenge starts now&#33;</h3>
+          <% } %>
+        </div>
+        <div id='go_box_1'>
+          <div class='row-fluid'>
+            <div class='span8 pull-right' id='go_link_container'>
+              <% if(window.existing_user == false) { %>
+              	<div id="go_link_frame">
+              		<h3>Start >></h3>
+              		</div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+        <div id='info_frame_close_link'>
+          <div class='row-fluid'>
+            <div class='span12'>
+              <span class='glyphicon glyphicon-remove'></span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </script>
 <script id='summary_frame_template' type='text/template'>
   <% console.log() %>
+</script>
+<script id='info_frame_end_template' type='text/template'>
+  <div id='info_frame'>
+    <div class='row-fluid'>
+      <div class='span12'>
+        <div id='info_frame_logo'>
+          <img src='/img/titleimage.png'>
+        </div>
+        <div id='info_frame_close_link'>
+          <div class='row-fluid'>
+            <div class='span12'>
+              <span class='glyphicon glyphicon-remove'></span>
+            </div>
+          </div>
+        </div>
+        <div id='info_box_end'>
+          <h3>
+            Your 24 hours is up. How much could you save on your electricity?
+          </h3>
+          <h4>
+            Hopefully over the last 24 hours you managed to successfully record your energy usage. If not, don't worry, you can always press "Reset app"
+            at the bottom of the page in order to try again.</br></br>
+            It is now that you can fully get an idea of how much you spend a year on your current tariff. Why not see how much you can save by pressing "My savings"
+            to get an overall impression of your yearly spend.</br></br>
+            Your control panel has now stopped but you can view your timings. Why not give the challenge another go?
+          </h4>
+        </div>
+      </div>
+    </div>
+  </div>
 </script>
