@@ -14,6 +14,7 @@
     window.tariff = null;
     current_page = null;
     $('#app_container').data('complete', false);
+    $('#app_container').data('disable', false);
     $('#timer_view_link').data("loading");
     in_use = $.cookie('in_use');
     if (in_use === 'true') {
@@ -74,66 +75,73 @@
     };
     initialisePageCalculator = function() {
       var appliance, appliance_id, calculatorTimer, currency_string, pence_fraction, running_cost, timer, total_timestamp, unit_rate, updateCalculatorTimer, wattage, _i, _len, _ref;
-      unit_rate = window.tariff.unit_rate;
-      _ref = timerCollection.models;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        timer = _ref[_i];
-        appliance_id = timer.get('appliance_id');
-        appliance = applianceCollection.get(appliance_id);
-        wattage = appliance.get('wattage');
-        if (timer.get('is_active') === 0) {
-          total_timestamp = timer.get('total_timestamp');
-          if (total_timestamp > 0) {
-            $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
-            running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
-            currency_string = formatCurrency(running_cost, 4);
-            pence_fraction = currency_string.slice(-2);
-            currency_string = currency_string.substr(0, currency_string.length - 2);
-            $('#' + timer.get('appliance_id') + '.cost-display').html(currency_string + "<span class=\"pence-fraction\">." + pence_fraction + "</span>");
-          }
-        }
-      }
-      updateCalculatorTimer = function() {
-        var days, is_active, minutes, start_timestamp, total_cost, _j, _len1, _ref1;
-        window.current_timestamp = (new Date).getTime();
-        total_cost = parseFloat(window.tariff.standing_charge);
-        days = (window.current_timestamp - parseFloat(window.user.get('start_timestamp'))) / (60 * 60 * 1000 * 24);
-        minutes = (window.current_timestamp - parseFloat(window.user.get('start_timestamp'))) / (60 * 1000);
-        if (days > 1 && $('#app_container').data('complete') === false) {
-          $('#info_frame_container').html($('#info_frame_end_template').html());
-          $('#info_frame_link').trigger('click');
-          $('.turn-off').trigger('click');
-          $('#app_container').data('complete', true);
-          $.removeCookie('user_id');
-        }
-        console.log(minutes);
+      if (window.tariff !== void 0) {
         unit_rate = window.tariff.unit_rate;
-        _ref1 = timerCollection.models;
-        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-          timer = _ref1[_j];
+        _ref = timerCollection.models;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          timer = _ref[_i];
           appliance_id = timer.get('appliance_id');
           appliance = applianceCollection.get(appliance_id);
           wattage = appliance.get('wattage');
-          is_active = timer.get('is_active');
-          total_timestamp = timer.get('total_timestamp');
-          start_timestamp = timer.get('start_timestamp');
-          if (is_active === 1) {
-            total_timestamp += current_timestamp - start_timestamp;
-            console.log("total_timestamp " + total_timestamp);
-            $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
-          }
-          running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
-          total_cost += running_cost;
-          if (parseFloat(total_timestamp) > 0 || parseFloat(start_timestamp) > 0) {
-            currency_string = formatCurrency(running_cost, 4);
-            pence_fraction = currency_string.slice(-2);
-            currency_string = currency_string.substr(0, currency_string.length - 2);
-            $('#' + timer.get('appliance_id') + '.cost-display').html(currency_string + "<span class=\"pence-fraction\">." + pence_fraction + "</span>");
+          if (timer.get('is_active') === 0) {
+            total_timestamp = timer.get('total_timestamp');
+            if (total_timestamp > 0) {
+              $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
+              running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
+              currency_string = formatCurrency(running_cost, 4);
+              pence_fraction = currency_string.slice(-2);
+              currency_string = currency_string.substr(0, currency_string.length - 2);
+              $('#' + timer.get('appliance_id') + '.cost-display').html(currency_string + "<span class=\"pence-fraction\">." + pence_fraction + "</span>");
+            }
           }
         }
-        return $('#total_cost').html(formatCurrency(total_cost));
-      };
-      return calculatorTimer = $.timer(updateCalculatorTimer, 200, true);
+        updateCalculatorTimer = function() {
+          var end_timestamp, hours, is_active, minutes, seconds, start_timestamp, total_cost, total_time, total_time_date, _j, _len1, _ref1;
+          window.current_timestamp = (new Date).getTime();
+          total_cost = parseFloat(window.tariff.standing_charge);
+          total_time = parseFloat(window.current_timestamp) - parseFloat(window.user.get('start_timestamp'));
+          end_timestamp = parseFloat(window.user.get('start_timestamp')) + (24 * 60 * 60 * 1000);
+          total_time_date = new Date(86400000 - total_time);
+          hours = total_time_date.getHours();
+          minutes = total_time_date.getMinutes();
+          seconds = total_time_date.getSeconds();
+          $('#total_time').html(hours + "h " + minutes + "m " + seconds + "s");
+          if ((86400000 - total_time) <= 0 && $('#app_container').data('complete') === false) {
+            $('#info_frame_container').html($('#info_frame_end_template').html());
+            $('#info_frame_link').trigger('click');
+            $('.turn-off').trigger('click');
+            $('#app_container').data('complete', true);
+            $.removeCookie('user_id');
+          }
+          console.log(minutes);
+          unit_rate = window.tariff.unit_rate;
+          _ref1 = timerCollection.models;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            timer = _ref1[_j];
+            appliance_id = timer.get('appliance_id');
+            appliance = applianceCollection.get(appliance_id);
+            wattage = appliance.get('wattage');
+            is_active = timer.get('is_active');
+            total_timestamp = timer.get('total_timestamp');
+            start_timestamp = timer.get('start_timestamp');
+            if (is_active === 1) {
+              total_timestamp += current_timestamp - start_timestamp;
+              console.log("total_timestamp " + total_timestamp);
+              $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
+            }
+            running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
+            total_cost += running_cost;
+            if (parseFloat(total_timestamp) > 0 || parseFloat(start_timestamp) > 0) {
+              currency_string = formatCurrency(running_cost, 4);
+              pence_fraction = currency_string.slice(-2);
+              currency_string = currency_string.substr(0, currency_string.length - 2);
+              $('#' + timer.get('appliance_id') + '.cost-display').html(currency_string + "<span class=\"pence-fraction\">." + pence_fraction + "</span>");
+            }
+          }
+          return $('#total_cost').html(formatCurrency(total_cost));
+        };
+        return calculatorTimer = $.timer(updateCalculatorTimer, 200, true);
+      }
     };
     initialiseTariffSelector = function() {
       window.tariffSelector = new TariffSelectorModel();
@@ -160,8 +168,6 @@
         comparisonCollectionView = new ComparisonCollectionView({
           collection: comparisonCollection
         });
-        console.log("comparison collection ");
-        console.log(comparisonCollection.toJSON());
         $('#summary_view_link').data("comparison_data", comparisonCollectionView.render().el);
         return $('#summary_view_link').data("ready", true);
       });
@@ -189,8 +195,6 @@
       });
       $('#timer_view_link').on({
         'click': function(event) {
-          console.log($('#timer_view_link').data("loading"));
-          console.log($('#summary_view_link').data("loading"));
           if ($('#timer_view_link').data("loading") || $('#summary_view_link').data("loading")) {
             return false;
           } else {
@@ -201,18 +205,22 @@
               }, function(template) {
                 var appliances;
                 $('#app_templates').append(template);
-                $('#page_container').append($(template).html());
+                $('#page_container').html($(template).html());
                 appliances = applianceCollection.models;
                 $('#timer_gallery').html(timerCollectionView.render(appliances).el);
                 initialisePageCalculator();
-                return $('#timer_view_link').removeData("loading");
+                return setTimeout(function() {
+                  return $('#timer_view_link').removeData("loading");
+                }, 400);
               });
             } else {
               if (current_page === "summary") {
                 summary_view = $('#summary_view').detach();
-                $('#page_container').append(timer_view);
+                $('#page_container').html(timer_view);
               }
-              $('#timer_view_link').removeData("loading");
+              setTimeout(function() {
+                return $('#timer_view_link').removeData("loading");
+              }, 400);
             }
             current_page = "timer";
             return false;
@@ -236,10 +244,12 @@
                   if ($('#summary_view_link').data("ready") !== void 0) {
                     current_page = "summary";
                     timer_view = $('#timer_view').detach();
-                    $('#page_container').append($(template).html());
+                    $('#page_container').html($(template).html());
                     $('#comparisons').html($('#summary_view_link').data('comparison_data'));
                     $('#summary_view_link').removeData("ready");
-                    $('#summary_view_link').removeData("loading");
+                    setTimeout(function() {
+                      return $('#summary_view_link').removeData("loading");
+                    }, 400);
                     $('#summary_view_link').removeData("comparison_data");
                     return summaryTimer.stop();
                   }
@@ -253,9 +263,11 @@
                   if ($('#summary_view_link').data("ready") !== void 0) {
                     current_page = "summary";
                     timer_view = $('#timer_view').detach();
-                    $('#page_container').append(summary_view);
+                    $('#page_container').html(summary_view);
                     $('#comparisons').html($('#summary_view_link').data('comparison_data'));
-                    $('#summary_view_link').removeData("loading");
+                    setTimeout(function() {
+                      return $('#summary_view_link').removeData("loading");
+                    }, 400);
                     $('#summary_view_link').removeData("ready");
                     $('#summary_view_link').removeData("comparison_data");
                     return summaryTimer.stop();
@@ -318,8 +330,8 @@
           });
           return window.user.fetch({
             success: function(model, response) {
-              fetchModels();
-              return initialiseTariffSelector();
+              initialiseTariffSelector();
+              return fetchModels();
             }
           });
         });
@@ -332,8 +344,8 @@
         });
         return window.user.fetch({
           success: function(model, response) {
-            fetchModels(true);
-            return initialiseTariffSelector();
+            initialiseTariffSelector();
+            return fetchModels(true);
           }
         });
       }

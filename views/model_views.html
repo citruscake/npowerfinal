@@ -150,9 +150,9 @@
       </div>
       <div class='row-fluid'>
         <div class='span12'>
-          <h3>
-            That's enough saving to purchase a <%= saving_reward.title %>
-          </h3>
+          <% if(saving_reward.title != "nothing") { %>
+          	<h3>That's enough saving to purchase a <%= saving_reward.title %><h3>
+          <% } %>
         </div>
       </div>
     </div>
@@ -184,6 +184,17 @@
   	});
   	
   %>
+  <div class='row-fluid' id='label_frame'>
+    <div class='span4' id='region_label'>
+      Region :
+    </div>
+    <div class='span4' id='provider_label'>
+      Provider :
+    </div>
+    <div class='span4' id='tariff_label'>
+      Tariff :
+    </div>
+  </div>
   <div class='row-fluid'>
     <div class='span4' id='select_region_frame'>
       <div class='styled-select'>

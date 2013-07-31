@@ -1,5 +1,6 @@
 #timer_gallery {
-  margin-top: 40px;
+  margin-left: 45px;
+  margin-top: 45px;
 }
 #timer_gallery .row-fluid .timer-container {
   margin-left: 0px;
@@ -115,10 +116,6 @@
   border-color: #888888;
   border-width: 0px 1px 0px 0px;
   border-style: solid;
-}
-
-#timer_gallery {
-  margin-left: 35px;
 }
 
 #timer_gallery ul {
@@ -279,7 +276,7 @@ body {
 #app_container #app_header {
   background-color: #111111;
   border-radius: 0px 0px 3px 3px;
-  padding-bottom: 20px;
+  padding-bottom: 18px;
 }
 #app_container #app_header #app_nav {
   min-width: 620px;
@@ -289,7 +286,7 @@ body {
   width: 200px;
   height: 100px;
   margin-left: 30px;
-  margin-top: 25px;
+  margin-top: 40px;
   border-radius: 1px;
   -webkit-box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
   box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
@@ -307,11 +304,11 @@ body {
   margin-left: 20px;
 }
 #app_container #app_header #app_nav .row-fluid .span7 .navbar {
-  height: 120px;
+  height: 140px;
   margin-bottom: 0px;
 }
 #app_container #app_header #app_nav .row-fluid .span7 .navbar .navbar-inner {
-  height: 125px;
+  height: 140px;
   background-color: transparent;
   background-image: none;
   position: absolute;
@@ -345,28 +342,68 @@ body {
   background-color: #222222;
 }
 #app_container #app_header #app_tariff_data {
-  min-width: 432px;
+  min-width: 510px;
   height: 85px;
 }
-#app_container #app_header #app_tariff_data .row-fluid #total_cost_frame {
+#app_container #app_header #app_tariff_data .row-fluid #totals_frame {
   height: 50px;
   width: 280px;
   margin-top: 10px;
   margin-right: 10px;
 }
-#app_container #app_header #app_tariff_data .row-fluid #total_cost_frame #total_cost {
+#app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_left_frame {
+  width: 140px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_left_frame #total_time_label {
+  margin: 0px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_left_frame #total_time {
+  font-family: Fredoka One;
+  color: #eeeeee;
+  margin-left: 3px;
+  position: relative;
+  margin-right: 16px;
+  font-size: 20px;
+  margin-top: 3px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_right_frame {
+  width: 220px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_right_frame #total_cost_label {
+  margin: 0px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_right_frame #total_cost {
   height: 60px;
   font-size: 60px;
   font-family: Fredoka One, sans-serif;
   line-height: 60px;
-  padding: 10px 0px 0px 0px;
+  padding: 6px 0px 0px 0px;
   margin-right: 5px;
   color: #eeeeee;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame {
-  margin-top: 25px;
+  margin-top: -11px;
   min-width: 508px;
-  margin-right: 10px;
+  margin-right: 7px;
+  color: #333333;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame #label_frame {
+  margin-bottom: 2px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame #label_frame #region_label {
+  text-align: left;
+  min-height: 0px;
+  width: 207px;
+  margin-left: 5px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame #label_frame #provider_label {
+  text-align: left;
+  min-height: 0px;
+  width: 143px;
+}
+#app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame #label_frame #tariff_label {
+  width: 45px;
+  min-height: 0px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame .row-fluid #select_region_frame {
   width: 215px;

@@ -78,8 +78,18 @@
 												?
 				#app_tariff_data.span4.pull-right
 					.row-fluid
-						#total_cost_frame.span8.pull-right
-							#total_cost.pull-right
+						.span12
+							#totals_frame.row-fluid
+								#total_left_frame.span6
+									#total_time_label
+										Time remaining :
+									#total_time
+								#total_right_frame.span6
+									#total_cost_label
+										Total spend : 
+									#total_cost
+						//#total_time_frame.span6.pull-right
+						//#total_time.pull-right
 					.row-fluid
 						#tariff_options_frame.span8.pull-right
 			#page_container.row-fluid.clearfix

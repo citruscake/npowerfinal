@@ -87,6 +87,7 @@ window.initialiseTariffSelectorModel = ->
 			window.tariff = _.find tariff_data, (tariff) ->
 				#console.log tariff.tariff_id
 				return tariff.tariff_id == tariff_id
+			#console.log "window tariff is "+window.tariff
 			#$('#total_cost').html '&#163;'+window.tariff.unit_rate
 	
 		render : (user_data) ->

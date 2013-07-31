@@ -106,9 +106,10 @@
 							Tariff : <%= alternate_tariff.tariff_label %>
 			.row-fluid
 				.span12
-					%h3
-						That's enough saving to purchase a <%= saving_reward.title %>
-				
+					:plain
+						<% if(saving_reward.title != "nothing") { %>
+							<h3>That's enough saving to purchase a <%= saving_reward.title %><h3>
+						<% } %>
 				
 %script{:type => "text/template", :id => "tariff_selector"}
 	:plain
@@ -137,6 +138,13 @@
 			});
 			
 		%>
+	#label_frame.row-fluid
+		#region_label.span4
+			Region :
+		#provider_label.span4
+			Provider :
+		#tariff_label.span4
+			Tariff :
 	.row-fluid
 		#select_region_frame.span4
 			.styled-select

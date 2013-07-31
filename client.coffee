@@ -14,6 +14,7 @@ $ ->
 	current_page = null
 	
 	$('#app_container').data('complete', false)
+	$('#app_container').data('disable', false)
 	$('#timer_view_link').data("loading") 
 	
 	in_use = $.cookie 'in_use'
@@ -26,9 +27,7 @@ $ ->
 	window.onbeforeunload = ->
 		$.removeCookie 'in_use'
 		return null
-	
-	#window.user_id = '2a550081-364e-4aa5-b438-4b21f60c158e'
-			
+
 	fetchModels = () ->
 
 		applianceCollection.fetch
@@ -56,16 +55,6 @@ $ ->
 			error : (h,response) ->
 			
 	initialiseInfoFrameCloseFunctionality = ->		
-		
-		
-		#$('#info_frame_container').on 'click', '#go_link_frame' : (event) ->
-		#	$('#info_frame_container').trigger 'click'
-			#$('#info_frame_container').animate
-			#	opacity : 0
-			#, 200, 'easeOutSine'
-			#, ->
-			#	$('#info_frame_container').css 'top', '-1000px'
-			#	$('body').css "overflow", "visible"
 			
 		$('#info_frame_container').on 'click', '#info_frame_close_link,#go_link_frame', (event) ->
 			$('#info_frame_container').css 'top', '-1000px'
@@ -82,75 +71,91 @@ $ ->
 	
 	initialisePageCalculator = ->
 
-		unit_rate = window.tariff.unit_rate
-	
-		for timer in timerCollection.models
-			appliance_id = timer.get 'appliance_id'
-			appliance = applianceCollection.get appliance_id
-			wattage = appliance.get 'wattage'
-			
-			if timer.get('is_active') == 0
-				total_timestamp = timer.get('total_timestamp') 
-				if total_timestamp > 0
-					#formatted_time = formatTimestamp total_timestamp
-					$('#'+timer.get('appliance_id')+'.time-display').html formatTimestamp total_timestamp
-					running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
-					#$('#'+timer.get('appliance_id')+'.cost-display').html formatCurrency running_cost
-					
-					currency_string = formatCurrency running_cost, 4
-					pence_fraction = currency_string.slice -2
-					currency_string = currency_string.substr(0, currency_string.length-2)
-					$('#'+timer.get('appliance_id')+'.cost-display').html currency_string+"<span class=\"pence-fraction\">."+pence_fraction+"</span>"
-					#$('#'+timer.get('appliance_id')+'.pence-fraction-display').html formatCurrency running_cost, true
-	
-		updateCalculatorTimer = ->
-			window.current_timestamp = (new Date).getTime()
-			total_cost = parseFloat window.tariff.standing_charge
-			#console.log "total_cost is "+window.tariff.standing_charge
-			
-			days = (window.current_timestamp - parseFloat(window.user.get 'start_timestamp')) / (60*60*1000*24)
-			minutes = (window.current_timestamp - parseFloat(window.user.get 'start_timestamp')) / (60*1000)
-			#if minutes > 2 && $('#app_container').data('complete') == false
-			if days > 1 && $('#app_container').data('complete') == false
-			#	#time to end it
-				$('#info_frame_container').html $('#info_frame_end_template').html()
-				$('#info_frame_link').trigger 'click'
-				$('.turn-off').trigger 'click'
-				$('#app_container').data 'complete', true
-				
-				$.removeCookie 'user_id'
-				
-			console.log minutes
-			
+		if (window.tariff != undefined)
 			unit_rate = window.tariff.unit_rate
+	
 			for timer in timerCollection.models
 				appliance_id = timer.get 'appliance_id'
 				appliance = applianceCollection.get appliance_id
 				wattage = appliance.get 'wattage'
-				is_active = timer.get 'is_active'
-				total_timestamp = timer.get('total_timestamp')
-				
-				start_timestamp = timer.get 'start_timestamp'
-				if is_active == 1
-					#start_timestamp = timer.get 'start_timestamp'
-					total_timestamp += current_timestamp - start_timestamp
-					console.log "total_timestamp "+total_timestamp
-					$('#'+timer.get('appliance_id')+'.time-display').html formatTimestamp total_timestamp
-				
-				running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
-				total_cost += running_cost
-				#console.log "adding "+running_cost
-				
-				#if is_active == 1
-				if parseFloat(total_timestamp) > 0 || parseFloat(start_timestamp) > 0
-					currency_string = formatCurrency running_cost, 4
-					pence_fraction = currency_string.slice -2
-					currency_string = currency_string.substr(0, currency_string.length-2)
-					$('#'+timer.get('appliance_id')+'.cost-display').html currency_string+"<span class=\"pence-fraction\">."+pence_fraction+"</span>"
-					
-			$('#total_cost').html formatCurrency total_cost
 			
-		calculatorTimer = $.timer(updateCalculatorTimer, 200, true)
+				if timer.get('is_active') == 0
+					total_timestamp = timer.get('total_timestamp') 
+					if total_timestamp > 0
+						
+						$('#'+timer.get('appliance_id')+'.time-display').html formatTimestamp total_timestamp
+						running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
+
+						currency_string = formatCurrency running_cost, 4
+						pence_fraction = currency_string.slice -2
+						currency_string = currency_string.substr(0, currency_string.length-2)
+						$('#'+timer.get('appliance_id')+'.cost-display').html currency_string+"<span class=\"pence-fraction\">."+pence_fraction+"</span>"
+	
+			updateCalculatorTimer = ->
+			
+				window.current_timestamp = (new Date).getTime()
+
+				total_cost = parseFloat window.tariff.standing_charge
+				total_time = parseFloat(window.current_timestamp) - parseFloat(window.user.get 'start_timestamp')
+			
+			#	alert "start timestamp is "+window.user.get 'start_timestamp'
+			
+				end_timestamp = parseFloat(window.user.get('start_timestamp')) + (24*60*60*1000)
+				
+				#alert total_time
+				
+				#html = total_time_date.getHours()+":"+total_time_date.getMinutes()+":"+total_time_date.getSeconds()+"</br></br>"
+				total_time_date = new Date(86400000-total_time)
+				#total_time_date = new Date(total_time)
+				
+				hours = total_time_date.getHours()
+				minutes = total_time_date.getMinutes()
+				seconds = total_time_date.getSeconds()
+				
+			#	total_time_html = "<div class=\"span6\"><span class=\"total_label\">Time left:</span><span class=\"total_time\">"+hours+"h "+minutes+"m "+seconds+"s"+"</span></div>"
+				
+				$('#total_time').html hours+"h "+minutes+"m "+seconds+"s"
+				#$('#total_time').html hours+"h "+minutes+"m "+seconds+"s left"
+				
+				#days = (total_time) / (60*60*1000*24)
+				
+				if (86400000-total_time) <= 0 && $('#app_container').data('complete') == false
+					$('#info_frame_container').html $('#info_frame_end_template').html()
+					$('#info_frame_link').trigger 'click'
+					$('.turn-off').trigger 'click'
+					$('#app_container').data 'complete', true
+				
+					$.removeCookie 'user_id'
+				
+				console.log minutes
+			
+				unit_rate = window.tariff.unit_rate
+				for timer in timerCollection.models
+					appliance_id = timer.get 'appliance_id'
+					appliance = applianceCollection.get appliance_id
+					wattage = appliance.get 'wattage'
+					is_active = timer.get 'is_active'
+					total_timestamp = timer.get('total_timestamp')
+				
+					start_timestamp = timer.get 'start_timestamp'
+					if is_active == 1
+						total_timestamp += current_timestamp - start_timestamp
+						console.log "total_timestamp "+total_timestamp
+						$('#'+timer.get('appliance_id')+'.time-display').html formatTimestamp total_timestamp
+				
+					running_cost = (total_timestamp / (60*60*1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000)
+					total_cost += running_cost
+
+					if parseFloat(total_timestamp) > 0 || parseFloat(start_timestamp) > 0
+						currency_string = formatCurrency running_cost, 4
+						pence_fraction = currency_string.slice -2
+						currency_string = currency_string.substr(0, currency_string.length-2)
+						$('#'+timer.get('appliance_id')+'.cost-display').html currency_string+"<span class=\"pence-fraction\">."+pence_fraction+"</span>"
+					
+			#	total_cost_html = "<div class=\"span6\"><span class=\"total_label\">Total spend : </span><span class=\"total_cost\">"+formatCurrency(total_cost)+"</span></div>"
+				$('#total_cost').html formatCurrency(total_cost)
+			
+			calculatorTimer = $.timer(updateCalculatorTimer, 200, true)
 	
 	initialiseTariffSelector = ->
 		
@@ -168,17 +173,14 @@ $ ->
 			user_id : window.user.get 'user_id'
 			timestamp : timestamp
 		$.get '/comparisons/generate', data, (response, callback) ->
-			#console.log $.parseJSON response
+
 			comparisonCollection = new ComparisonCollection $.parseJSON response
 			comparisonCollectionView = new ComparisonCollectionView
 				collection : comparisonCollection
-			#comparisonCollection.fetch()
-			console.log "comparison collection "
-			console.log comparisonCollection.toJSON()
-			#$('#comparisons').html comparisonCollectionView.render().el	
+
 			$('#summary_view_link').data("comparison_data", comparisonCollectionView.render().el)
 			$('#summary_view_link').data("ready", true)
-			#$('#overall_summary').html _.template $('#summary_frame_template').html(), timerCollection.toJSON()
+
 
 	$('document').ready ->
 	
@@ -194,9 +196,7 @@ $ ->
 			window.location.href = "/"
 	
 		$('#timer_view_link').on 'click' : (event) ->
-			console.log $('#timer_view_link').data("loading") 
-			console.log $('#summary_view_link').data("loading")
-			
+
 			if $('#timer_view_link').data("loading") || $('#summary_view_link').data("loading")
 				return false
 			else
@@ -204,19 +204,23 @@ $ ->
 				if $('#timer_view_template').length == 0
 					$.get "/views/fetch", { view : 'timer' }, (template) ->
 						$('#app_templates').append template
-						$('#page_container').append $(template).html()
+						$('#page_container').html $(template).html()
 
 						appliances = applianceCollection.models
 	
 						$('#timer_gallery').html timerCollectionView.render(appliances).el
 
 						initialisePageCalculator()
-						$('#timer_view_link').removeData("loading")
+						setTimeout ->
+							$('#timer_view_link').removeData("loading")
+						, 400
 				else
 					if current_page == "summary"
 						summary_view = $('#summary_view').detach()
-						$('#page_container').append timer_view
-					$('#timer_view_link').removeData("loading")
+						$('#page_container').html timer_view
+					setTimeout ->
+						$('#timer_view_link').removeData("loading")
+					, 400
 					
 				current_page = "timer"
 				return false
@@ -234,10 +238,12 @@ $ ->
 							if $('#summary_view_link').data("ready") != undefined
 								current_page = "summary"
 								timer_view = $('#timer_view').detach()
-								$('#page_container').append $(template).html()
+								$('#page_container').html $(template).html()
 								$('#comparisons').html $('#summary_view_link').data('comparison_data')
 								$('#summary_view_link').removeData("ready")
-								$('#summary_view_link').removeData("loading")
+								setTimeout ->
+									$('#summary_view_link').removeData("loading")
+								, 400
 								$('#summary_view_link').removeData("comparison_data")
 								summaryTimer.stop()
 									
@@ -249,9 +255,11 @@ $ ->
 							if $('#summary_view_link').data("ready") != undefined
 								current_page = "summary"
 								timer_view = $('#timer_view').detach()
-								$('#page_container').append summary_view
+								$('#page_container').html summary_view
 								$('#comparisons').html $('#summary_view_link').data('comparison_data')
-								$('#summary_view_link').removeData("loading")
+								setTimeout ->
+									$('#summary_view_link').removeData("loading")
+								, 400
 								$('#summary_view_link').removeData("ready")
 								$('#summary_view_link').removeData("comparison_data")
 								summaryTimer.stop()
@@ -294,8 +302,6 @@ $ ->
 		
 		window.user = new UserModel()
 		
-		#$.removeCookie 'user_id'
-			
 		if typeof($.cookie 'user_id') == 'undefined'
 			window.existing_user = false
 			start_timestamp = new Date().getTime()
@@ -308,17 +314,15 @@ $ ->
 					user_id : user_id
 				window.user.fetch
 					success : (model,response) ->
-						fetchModels()
 						initialiseTariffSelector()
+						fetchModels()
 		else
 			user_id = $.cookie 'user_id'
 			window.existing_user = true
-			#alert "welcome back "+user_id
-			#window.user_id = user_id
 			$.cookie('user_id').expires = 1
 			window.user = new UserModel
 				user_id : user_id
 			window.user.fetch
 				success : (model,response) ->
-					fetchModels(true)
 					initialiseTariffSelector()
+					fetchModels(true)

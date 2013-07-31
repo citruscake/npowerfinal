@@ -71,7 +71,7 @@ body
 		background-color : #111111
 		border-radius : 0px 0px 3px 3px
 		//background-image : url('/img/subtle_carbon.png')
-		padding-bottom : 20px
+		padding-bottom : 18px
 		#app_nav
 			min-width : 620px
 			.row-fluid
@@ -81,7 +81,7 @@ body
 						width : 200px
 						height : 100px
 						margin-left : 30px
-						margin-top : 25px
+						margin-top : 40px
 						border-radius : 1px
 						-webkit-box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
 						box-shadow :  1px 1px 1px 2px rgba(1, 1, 1, 0.1)
@@ -100,10 +100,10 @@ body
 							margin-left: 20px
 				.span7
 					.navbar
-						height : 120px
+						height : 140px
 						margin-bottom : 0px
 						.navbar-inner
-							height : 125px
+							height : 140px
 							background-color : transparent
 							background-image : none
 							position : absolute
@@ -132,31 +132,64 @@ body
 									&:hover
 										background-color : #222222
 		#app_tariff_data
-			min-width: 432px
+			min-width: 510px
 			height : 85px
 			.row-fluid
-				#total_cost_frame
+				#totals_frame
 					height : 50px
 					width : 280px
 					//background-color : #cccccc
 					margin-top : 10px
 					margin-right : 10px
-					#total_cost
-						height : 60px
-						//width : 250px
-						//background-color : #aaaaaa
-						font-size : 60px
-						//font-family : poiret-one, sans-serif
-						font-family : Fredoka One, sans-serif
-						line-height : 60px
-						padding : 10px 0px 0px 0px
-						margin-right : 5px
-						color : #eeeeee
+					#total_left_frame
+						width : 140px
+						#total_time_label
+							margin : 0px
+						#total_time
+							font-family : Fredoka One
+							color : #eeeeee
+							//margin-top : 12px
+							margin-left : 3px
+							position : relative
+							margin-right : 16px
+							font-size : 20px
+							//margin-left : 110px
+							margin-top : 3px
+					#total_right_frame
+						width : 220px
+						#total_cost_label
+							margin : 0px
+						#total_cost
+							height : 60px
+							//width : 250px
+							//background-color : #aaaaaa
+							font-size : 60px
+							//font-family : poiret-one, sans-serif
+							font-family : Fredoka One, sans-serif
+							line-height : 60px
+							padding : 6px 0px 0px 0px
+							margin-right : 5px
+							color : #eeeeee
 			.row-fluid
 				#tariff_options_frame
-					margin-top: 25px
+					margin-top: -11px
 					min-width: 508px
-					margin-right : 10px
+					margin-right : 7px
+					color : #333333
+					#label_frame
+						margin-bottom : 2px
+						#region_label
+							text-align: left
+							min-height : 0px
+							width: 207px
+							margin-left: 5px
+						#provider_label
+							text-align : left
+							min-height : 0px
+							width : 143px
+						#tariff_label
+							width : 45px
+							min-height : 0px
 					.row-fluid
 						#select_region_frame
 							width : 215px

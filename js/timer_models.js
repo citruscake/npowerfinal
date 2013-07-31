@@ -28,7 +28,11 @@
       },
       timerToggle: function() {
         var appliance_id, data, is_active, timer, timestamp;
-        if ($('#app_container').data('complete') === false) {
+        if (($('#app_container').data('complete') === false) && ($('#app_container').data('disable') === false)) {
+          $('#app_container').data('disable', true);
+          setTimeout(function() {
+            return $('#app_container').data('disable', false);
+          }, 400);
           is_active = this.model.get('is_active');
           timestamp = (new Date).getTime();
           if (is_active === 1) {
