@@ -54,9 +54,9 @@ app.get '/', (request, response) ->
 app.get '/already_open', (request, response) ->
 	response.writeHead 200,
 			'Access-Control-Allow-Origin' : '*'
-	response.write "You have a page already open, please use only one instance at a time to prevent errors.\n\n"
+	response.write "You may have a page already open, please use only one instance at a time to prevent errors.\n\n"
 	response.write "If you cannot access the app then your browser may have not been closed properly in your last session. Try clearing your cookies "
-	response.write "and the problem should solve itself."
+	response.write "and the problem should solve itself.\n\nAlternatively try navigating to 24hourchallenge.eu01.aws.af.cm as the issue may be temporary."
 	response.end()
 	
 app.get '/js/:folder1?/:folder2?/:file', (request, response) ->
@@ -107,7 +107,7 @@ app.get '/img/:file', (request, response) ->
 	data = fs.readFileSync './img/'+request.params.file
 	response.writeHead 200,
 		'Access-Control-Allow-Origin' : '*',
-		'Content-type' : 'image/png'
+		#'Content-type' : 'image/png'
 	response.write data
 	response.end()
 		
@@ -181,7 +181,8 @@ app.all '/users/save', (request, response) ->
 	region_id = request.body.region_id
 	provider_id = request.body.provider_id
 	tariff_id = request.body.tariff_id
-	database.saveUserData user_id, region_id, provider_id, tariff_id, (status) ->
+	start_timestamp = request.body.start_timestamp
+	database.saveUserData user_id, region_id, provider_id, tariff_id, start_timestamp, (status) ->
 		response.write JSON.stringify status
 		response.end()
 			

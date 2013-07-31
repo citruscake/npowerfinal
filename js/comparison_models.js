@@ -9,7 +9,6 @@
       render: function() {
         var attributes;
         attributes = this.model.toJSON();
-        console.log(attributes);
         this.$el.html(this.template(attributes));
         return this;
       }
@@ -33,13 +32,12 @@
         if (this.collection.length !== 0) {
           this.collection.forEach(this.renderComparison, this);
         } else {
-          this.$el.append("<li><h3>No cheaper tariffs found yet- you're a saving star!</h3></li>");
+          this.$el.append("<li><h3 style=\"padding:20px 20px 20px 20px;\">No cheaper tariffs found yet - you're doing great!</h3></li>");
         }
         return this;
       },
       renderComparison: function(comparison) {
         var comparisonView;
-        console.log(comparison);
         comparisonView = new ComparisonView({
           model: comparison
         });

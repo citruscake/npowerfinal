@@ -69,9 +69,9 @@ exports.createUserData = (user_id, start_timestamp, callback) ->
 			callback "success"
 			return
 
-exports.saveUserData = (user_id, region_id, provider_id, tariff_id, callback) ->			
+exports.saveUserData = (user_id, region_id, provider_id, tariff_id, start_timestamp, callback) ->			
 	#exports.connect()
-	connection.query "UPDATE users SET region_id = '"+region_id+"', provider_id = '"+provider_id+"', tariff_id = '"+tariff_id+"' WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
+	connection.query "UPDATE users SET region_id = '"+region_id+"', provider_id = '"+provider_id+"', tariff_id = '"+tariff_id+"', start_timestamp = '"+start_timestamp+"' WHERE user_id = '"+user_id+"'", (error,rows,fields) ->
 		#exports.disconnect()
 		if error
 			throw error

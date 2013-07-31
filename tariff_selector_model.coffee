@@ -61,9 +61,6 @@ window.initialiseTariffSelectorModel = ->
 				return tariff.tariff_id
 			tariff_id = _.first tariff_ids
 			
-			console.log event.target.value
-			console.log region_id+" "+provider_id+" "+tariff_id
-			
 			window.user.set
 				provider_id : provider_id
 				tariff_id : tariff_id
@@ -77,7 +74,7 @@ window.initialiseTariffSelectorModel = ->
 			window.user.set
 				tariff_id : tariff_id
 			window.user.save()
-			console.log "saved "+window.user.get('region_id')+","+window.user.get('provider_id')+","+window.user.get('tariff_id')
+			
 			this.updateTariffData()
 			
 		updateTariffData : ->
@@ -87,6 +84,13 @@ window.initialiseTariffSelectorModel = ->
 			window.tariff = _.find tariff_data, (tariff) ->
 				#console.log tariff.tariff_id
 				return tariff.tariff_id == tariff_id
+			if window.current_page == "summary"
+				#want to reload summary
+				#alert "summary"
+				#$('#summary_reload_frame').html $('#summary_reload_frame_template').html()
+				#$('#summary_reload_frame').css "visibility", "visible"
+				$('#summary_view_link').trigger 'click'
+				
 			#console.log "window tariff is "+window.tariff
 			#$('#total_cost').html '&#163;'+window.tariff.unit_rate
 	

@@ -170,16 +170,61 @@
 #summary_view #usage_overview {
   margin-top: 20px;
 }
-#summary_view #usage_overview #savings .row-fluid .span12 {
+#summary_view #usage_overview #savings .row-fluid .span6 {
   margin: 0px;
+  width: 214px;
 }
-#summary_view #usage_overview #savings .row-fluid .span12 h5 {
+#summary_view #usage_overview #savings .row-fluid .span6 h5 {
   margin: 0px;
   color: #eeeeee;
   font-size: 25px;
   #font-family: Source Sans Pro, sans serif;
+  margin-top: 14px;
+}
+#summary_view #usage_overview #savings .row-fluid .span12 #yearly_spend_frame {
+  display: inline-block;
+  background-color: rgba(34, 34, 34, 0.4);
+  border-radius: 3px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  -webkit-box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
+  box-shadow: 1px 1px 1px 2px rgba(1, 1, 1, 0.1);
+  padding: 10px 20px 10px 20px;
+}
+#summary_view #usage_overview #savings .row-fluid .span12 #yearly_spend_frame h3 {
+  margin: 10px 0px 10px 0px;
+  font-size: 18px;
+  color: #eeeeee;
+  line-height: 12px;
+}
+#summary_view #usage_overview #savings .row-fluid .span6 #summary_reload_frame {
+  background-color: #111111;
+  visibility: hidden;
+  color: #eeeeee;
+  width: 218px;
+  height: 25px;
+  padding: 12px 10px 9px 16px;
+  border-radius: 3px;
+}
+#summary_view #usage_overview #savings .row-fluid .span6 #summary_reload_frame .row-fluid .span8 {
+  width: 163px;
+}
+#summary_view #usage_overview #savings .row-fluid .span6 #summary_reload_frame .row-fluid .span8 h3 {
+  font-family: Fredoka One, sans-serif;
+  font-size: 25px;
+  margin: 0px;
+  margin-top: 2px;
+  line-height: 18px;
+}
+#summary_view #usage_overview #savings .row-fluid .span6 #summary_reload_frame .row-fluid .span4 {
+  width: 40px;
+}
+#summary_view #usage_overview #savings .row-fluid .span6 #summary_reload_frame .row-fluid .span4 img {
+  margin-top: -7px;
+  margin-left: 15px;
 }
 #summary_view #usage_overview #savings #comparisons {
+  width: 808px;
   color: #eeeeee;
 }
 #summary_view #usage_overview #savings #comparisons ul {
@@ -238,7 +283,7 @@
 }
 #summary_view #usage_overview #savings #comparisons .comparison-frame .comparison-reward {
   border-radius: 3px;
-  width: 355px;
+  width: 285px;
   padding: 15px 15px 15px 25px;
   background-color: rgba(88, 97, 97, 0.2);
   margin: 0px;
@@ -347,12 +392,13 @@ body {
 }
 #app_container #app_header #app_tariff_data .row-fluid #totals_frame {
   height: 50px;
-  width: 280px;
+  width: 500px;
   margin-top: 10px;
   margin-right: 10px;
+  color: #666666;
 }
 #app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_left_frame {
-  width: 140px;
+  width: 145px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_left_frame #total_time_label {
   margin: 0px;
@@ -367,17 +413,18 @@ body {
   margin-top: 3px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_right_frame {
-  width: 220px;
+  text-align: right;
+  display: inline-block;
 }
 #app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_right_frame #total_cost_label {
+  text-align: left;
   margin: 0px;
 }
 #app_container #app_header #app_tariff_data .row-fluid #totals_frame #total_right_frame #total_cost {
   height: 60px;
-  font-size: 60px;
+  font-size: 50px;
   font-family: Fredoka One, sans-serif;
-  line-height: 60px;
-  padding: 6px 0px 0px 0px;
+  line-height: 50px;
   margin-right: 5px;
   color: #eeeeee;
 }
@@ -385,7 +432,7 @@ body {
   margin-top: -11px;
   min-width: 508px;
   margin-right: 7px;
-  color: #333333;
+  color: #666666;
 }
 #app_container #app_header #app_tariff_data .row-fluid #tariff_options_frame #label_frame {
   margin-bottom: 2px;
@@ -503,15 +550,15 @@ body {
   width: 80px;
 }
 #app_container #app_footer #reset_frame a {
-  color: #555555;
+  color: #666666;
   text-decoration: underline;
 }
 #app_container #app_footer #welcome_frame {
   width: 200px;
   padding-top: 5px;
-  padding-right: 10px;
+  padding-right: 5px;
   text-align: right;
-  color: #555555;
+  color: #666666;
 }
 #app_container #info_frame_container {
   height: 100%;
@@ -549,8 +596,8 @@ body {
   margin-top: 100px;
   width: 400px;
   background-color: #222222;
-  padding: 15px 10px 15px 10px;
   border-radius: 3px;
+  padding: 15px 10px 0px 10px;
   margin-left: 30px;
 }
 #app_container #info_frame_container #info_frame #info_box_1 h3 {
@@ -573,8 +620,8 @@ body {
   margin-top: 100px;
   width: 400px;
   background-color: #222222;
-  padding: 15px 10px 15px 10px;
   border-radius: 3px;
+  padding: 15px 10px 15px 10px;
   margin-left: 470px;
 }
 #app_container #info_frame_container #info_frame #info_box_2 h3 {
@@ -651,12 +698,12 @@ body {
   margin-top: 100px;
   width: 400px;
   background-color: #222222;
-  padding: 15px 10px 15px 10px;
   border-radius: 3px;
   margin-top: 45px;
   margin-left: 30px;
-  width: 860px;
+  width: 840px;
   height: 300px;
+  padding: 15px 10px 15px 10px;
 }
 #app_container #info_frame_container #info_frame #info_box_end h3 {
   font-family: sans-serif;

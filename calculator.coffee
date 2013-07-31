@@ -196,7 +196,11 @@ exports.calculateComparisons = (data) ->
 			alternate_tariff = _.find tariff_data, (_tariff) ->
 				tariff.tariff_id == _tariff.tariff_id
 			saving_reward = _.max reward_data, (reward) ->
-				reward.cost <= yearly_saving
+				console.log "reward cost "+reward.cost+", yearly saving "+yearly_saving
+				if reward.cost <= yearly_saving
+					return reward.cost
+				else
+					return -1
 			#console.log appliance_usages
 			tariff_comparison = 
 				comparison_id : tariff.tariff_id

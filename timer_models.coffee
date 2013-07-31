@@ -17,17 +17,18 @@ window.initialiseTimerModels = ->
 			'click .turn-off' : 'switchOff'
 			
 		switchOff : ->
-			
 			is_active = this.model.get 'is_active'
 			if is_active == 1
 				this.timerToggle()
 			
 		timerToggle : ->
-			if ($('#app_container').data('complete') == false) && ($('#app_container').data('disable') == false)
+
+			if (($('#app_container').data('complete') == true) && (window.ignoreDisable == true)) || (($('#app_container').data('complete') == false) && ($('#app_container').data('disable') == false))
 				$('#app_container').data('disable', true)
 				setTimeout ->
 					$('#app_container').data('disable', false)
 				, 400
+					
 				is_active = this.model.get 'is_active'
 				timestamp = (new Date).getTime()
 				if is_active == 1
@@ -47,7 +48,6 @@ window.initialiseTimerModels = ->
 				$.post '/timer/storeTimestamp', data, (response) ->
 					response = JSON.parse response
 				#is_active = response.is_active
-					console.log "IS_ACTIVE "+response.is_active
 				
 					if response.is_active == 0
 						start_timestamp = timer.model.get 'start_timestamp'
@@ -85,7 +85,6 @@ window.initialiseTimerModels = ->
 			time = $('#'+appliance_id+'.time-display')
 			
 			name = $('#'+appliance_id+'.name')
-			console.log button
 			if is_active == 0
 				button.animate
 					'background-color' : '#666666'
@@ -122,15 +121,13 @@ window.initialiseTimerModels = ->
 		render : (appliance) ->
 
 			this.template = this['template1']
-			#console.log this.model
-			#console.log appliance
+
 			#if has_timer 
 			#	attributes = $.extend {}, this.model.toJSON()
 			#attributes = $.extend attributes, appliance.toJSON()
 			attributes = $.extend this.model.toJSON(), appliance.toJSON()
 			this.$el.html this.template attributes
-			console.log "attributes..."
-			console.log attributes
+
 			$(this.el).addClass 'thumbnail'
 			#$(this.el).addClass 'ui-state-default'
 			$(this.el).attr 'id', appliance.get 'appliance_id'

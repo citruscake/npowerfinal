@@ -171,7 +171,12 @@
           return tariff.tariff_id === _tariff.tariff_id;
         });
         saving_reward = _.max(reward_data, function(reward) {
-          return reward.cost <= yearly_saving;
+          console.log("reward cost " + reward.cost + ", yearly saving " + yearly_saving);
+          if (reward.cost <= yearly_saving) {
+            return reward.cost;
+          } else {
+            return -1;
+          }
         });
         tariff_comparison = {
           comparison_id: tariff.tariff_id,

@@ -1,6 +1,6 @@
 (function() {
   $(function() {
-    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, current_page, fetchModels, in_use, initialiseInfoFrameCloseFunctionality, initialisePageCalculator, initialiseTariffSelector, summary_view, timerCollection, timerCollectionView, timer_view;
+    var applianceCollection, applianceCollectionView, calculateSummary, comparisonCollection, comparisonCollectionView, fetchModels, in_use, initialiseInfoFrameCloseFunctionality, initialisePageCalculator, initialiseTariffSelector, summary_view, timerCollection, timerCollectionView, timer_view;
     summary_view = null;
     timer_view = null;
     window.tariffSelector = null;
@@ -12,10 +12,12 @@
     comparisonCollectionView = null;
     window.user = null;
     window.tariff = null;
-    current_page = null;
+    window.current_page = null;
+    window.total_cost = 0;
+    window.total_time = 0;
+    window.ignoreDisable = false;
     $('#app_container').data('complete', false);
     $('#app_container').data('disable', false);
-    $('#timer_view_link').data("loading");
     in_use = $.cookie('in_use');
     if (in_use === 'true') {
       window.location.href = "/already_open";
@@ -31,7 +33,6 @@
     fetchModels = function() {
       return applianceCollection.fetch({
         success: function(collection, response) {
-          console.log(applianceCollection.models);
           return timerCollection.fetch({
             data: {
               user_id: window.user.get('user_id')
@@ -42,14 +43,13 @@
               $('#info_frame_container').css('top', '-1000px');
               timerCollection.addDummyTimers(applianceCollection.models);
               $('#timer_view_link').trigger('click');
-              current_page = "timer";
+              window.current_page = "timer";
               if (window.existing_user === false) {
                 $('#info_frame_link').trigger('click');
                 $('#welcome_frame').html("Welcome new user");
               } else {
                 $('#welcome_frame').html("Welcome back!");
               }
-              console.log(window.user);
               initialiseInfoFrameCloseFunctionality();
               return $('#timer_view_link').removeData("loading");
             },
@@ -61,9 +61,14 @@
     };
     initialiseInfoFrameCloseFunctionality = function() {
       return $('#info_frame_container').on('click', '#info_frame_close_link,#go_link_frame', function(event) {
+        var start_timestamp;
         $('#info_frame_container').css('top', '-1000px');
         if (window.existing_user === false) {
           window.existing_user = true;
+          start_timestamp = (new Date).getTime();
+          window.user.set('start_timestamp', start_timestamp);
+          window.user.save();
+          initialisePageCalculator();
           $('#info_frame_container').html(_.template($('#info_frame_template').html()));
         }
         return $('#info_frame_container').animate({
@@ -75,7 +80,7 @@
     };
     initialisePageCalculator = function() {
       var appliance, appliance_id, calculatorTimer, currency_string, pence_fraction, running_cost, timer, total_timestamp, unit_rate, updateCalculatorTimer, wattage, _i, _len, _ref;
-      if (window.tariff !== void 0) {
+      if (window.tariff !== null) {
         unit_rate = window.tariff.unit_rate;
         _ref = timerCollection.models;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -101,19 +106,24 @@
           total_cost = parseFloat(window.tariff.standing_charge);
           total_time = parseFloat(window.current_timestamp) - parseFloat(window.user.get('start_timestamp'));
           end_timestamp = parseFloat(window.user.get('start_timestamp')) + (24 * 60 * 60 * 1000);
-          total_time_date = new Date(86400000 - total_time);
+          total_time_date = new Date(86399999 - window.total_time);
           hours = total_time_date.getHours();
           minutes = total_time_date.getMinutes();
           seconds = total_time_date.getSeconds();
-          $('#total_time').html(hours + "h " + minutes + "m " + seconds + "s");
-          if ((86400000 - total_time) <= 0 && $('#app_container').data('complete') === false) {
+          if ((86399999 - window.total_time) > 0) {
+            $('#total_time').html(hours + "h " + minutes + "m " + seconds + "s");
+          } else {
+            $('#total_time').html("0h 0m 0s");
+          }
+          if ((86399999 - total_time) <= 0 && $('#app_container').data('complete') === false) {
             $('#info_frame_container').html($('#info_frame_end_template').html());
             $('#info_frame_link').trigger('click');
-            $('.turn-off').trigger('click');
             $('#app_container').data('complete', true);
+            window.ignoreDisable = true;
+            $('.turn-off').trigger('click');
+            window.ignoreDisable = false;
             $.removeCookie('user_id');
           }
-          console.log(minutes);
           unit_rate = window.tariff.unit_rate;
           _ref1 = timerCollection.models;
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -126,7 +136,6 @@
             start_timestamp = timer.get('start_timestamp');
             if (is_active === 1) {
               total_timestamp += current_timestamp - start_timestamp;
-              console.log("total_timestamp " + total_timestamp);
               $('#' + timer.get('appliance_id') + '.time-display').html(formatTimestamp(total_timestamp));
             }
             running_cost = (total_timestamp / (60 * 60 * 1000)) * parseFloat(unit_rate) * (parseFloat(wattage) / 1000);
@@ -138,7 +147,9 @@
               $('#' + timer.get('appliance_id') + '.cost-display').html(currency_string + "<span class=\"pence-fraction\">." + pence_fraction + "</span>");
             }
           }
-          return $('#total_cost').html(formatCurrency(total_cost));
+          $('#total_cost').html(formatCurrency(total_cost));
+          window.total_cost = total_cost;
+          return window.total_time = total_time;
         };
         return calculatorTimer = $.timer(updateCalculatorTimer, 200, true);
       }
@@ -208,13 +219,15 @@
                 $('#page_container').html($(template).html());
                 appliances = applianceCollection.models;
                 $('#timer_gallery').html(timerCollectionView.render(appliances).el);
-                initialisePageCalculator();
+                if (window.existing_user !== false) {
+                  initialisePageCalculator();
+                }
                 return setTimeout(function() {
                   return $('#timer_view_link').removeData("loading");
                 }, 400);
               });
             } else {
-              if (current_page === "summary") {
+              if (window.current_page === "summary") {
                 summary_view = $('#summary_view').detach();
                 $('#page_container').html(timer_view);
               }
@@ -222,7 +235,7 @@
                 return $('#timer_view_link').removeData("loading");
               }, 400);
             }
-            current_page = "timer";
+            window.current_page = "timer";
             return false;
           }
         }
@@ -233,6 +246,7 @@
           if ($('#summary_view_link').data("loading") || $('#timer_view_link').data("loading")) {
             return false;
           } else {
+            $('#summary_view_link').data("loading", true);
             if ($('#summary_view_template').length === 0) {
               $.get("/views/fetch", {
                 view: 'summary'
@@ -240,12 +254,16 @@
                 var summaryTimer, updateSummaryTimer;
                 $('#app_templates').append(template);
                 updateSummaryTimer = function() {
-                  console.log($('#summary_view_link').data("ready"));
+                  var total_timestamp, yearly_total;
                   if ($('#summary_view_link').data("ready") !== void 0) {
-                    current_page = "summary";
+                    window.current_page = "summary";
                     timer_view = $('#timer_view').detach();
                     $('#page_container').html($(template).html());
                     $('#comparisons').html($('#summary_view_link').data('comparison_data'));
+                    yearly_total = formatCurrency(window.total_cost * 365, 2);
+                    total_timestamp = formatTimestamp(window.total_time, true, false);
+                    $('#yearly_spend_frame').html("<h3>As of " + total_timestamp + " into the Challenge, you have spent " + formatCurrency(window.total_cost, 2) + ".</br></br>This equates to " + yearly_total + " a year.</h3>");
+                    $('#summary_reload_frame').html($('#summary_reload_frame_template').html());
                     $('#summary_view_link').removeData("ready");
                     setTimeout(function() {
                       return $('#summary_view_link').removeData("loading");
@@ -258,27 +276,32 @@
                 return calculateSummary();
               });
             } else {
-              if (current_page === "timer") {
-                updateSummaryTimer = function() {
-                  if ($('#summary_view_link').data("ready") !== void 0) {
-                    current_page = "summary";
+              $('#summary_reload_frame').css("visibility", "visible");
+              updateSummaryTimer = function() {
+                var total_timestamp, yearly_total;
+                if ($('#summary_view_link').data("ready") !== void 0) {
+                  if (window.current_page === "timer") {
                     timer_view = $('#timer_view').detach();
                     $('#page_container').html(summary_view);
-                    $('#comparisons').html($('#summary_view_link').data('comparison_data'));
-                    setTimeout(function() {
-                      return $('#summary_view_link').removeData("loading");
-                    }, 400);
-                    $('#summary_view_link').removeData("ready");
-                    $('#summary_view_link').removeData("comparison_data");
-                    return summaryTimer.stop();
                   }
-                };
-                summaryTimer = $.timer(updateSummaryTimer, 200, true);
-                calculateSummary();
-                $('#page_container').append(summary_view);
-              } else {
-                $('#summary_view_link').removeData("loading");
-              }
+                  window.current_page = "summary";
+                  yearly_total = formatCurrency(window.total_cost * 365, 2);
+                  total_timestamp = formatTimestamp(window.total_time, true, false);
+                  $('#yearly_spend_frame').html("<h3>As of " + total_timestamp + " into the Challenge, you have spent " + formatCurrency(window.total_cost, 2) + ".</br></br>This equates to " + yearly_total + " a year.</h3>");
+                  $('#comparisons').html($('#summary_view_link').data('comparison_data'));
+                  setTimeout(function() {
+                    return $('#summary_view_link').removeData("loading");
+                  }, 400);
+                  $('#summary_view_link').removeData("ready");
+                  $('#summary_view_link').removeData("comparison_data");
+                  $('#summary_reload_frame').css("visibility", "hidden");
+                  return summaryTimer.stop();
+                }
+              };
+              summaryTimer = $.timer(updateSummaryTimer, 200, true);
+              calculateSummary();
+              $('#page_container').append(summary_view);
+              $('#summary_view_link').removeData("loading");
             }
             return false;
           }
@@ -345,7 +368,7 @@
         return window.user.fetch({
           success: function(model, response) {
             initialiseTariffSelector();
-            return fetchModels(true);
+            return fetchModels();
           }
         });
       }

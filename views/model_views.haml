@@ -47,16 +47,10 @@
 						.span12
 							%table
 								%tr
-									%td
-										:plain
-									%td
-										Hours
-									%td
-										Mins
-									%td
-										Secs
-									%td
-										Mils
+									:plain
+										<% if (appliance_usages.length != 0) { %>
+											<td></td><td>Hours</td><td>Mins</td><td>Secs</td><td>Mils</td>
+										<% } %>
 								:plain		
 									<% _.each(appliance_usages, function(appliance_usage) { %>
 										<% appliance = _.find(appliance_data, function(appliance) {
@@ -75,8 +69,17 @@
 									%td
 										<%= reduction_timestamp[2] %>
 									%td
-										<%= reduction_timestamp[3] %>
+										:plain
+											<% if (reduction_timestamp[3] == "") { %>
+												0
+											<% } else { %>
+												<%= reduction_timestamp[3] %>
+											<% } %>
 								<% }); %>
+								:plain
+									<% if (appliance_usages.length == 0) { %>
+										<td>No appliance data gathered yet</td>
+									<% } %>
 				.comparison-or.span4
 					.row-fluid
 						.span12
@@ -86,7 +89,7 @@
 				.comparison-reward.span4
 					.row-fluid
 						.span12
-							Switch to this tariff :
+							You could simply switch to this tariff ... 
 							:plain
 								<% provider = _.find(window.tariffSelector.get('provider_data'), function(provider) {
 									return provider.provider_id == alternate_tariff.provider_id;
@@ -94,21 +97,20 @@
 								<% region = _.find(window.tariffSelector.get('region_data'), function(region) {
 									return region.region_id == alternate_tariff.region_id;
 								}); %>
-								<% console.log(window.tariffSelector.get('provider_data')); %>
 					.row-fluid
 						.span12
-							Provider : <%= provider.title %>
+							Provider: <%= provider.title %>
 					.row-fluid
 						.span12
-							Region : <%= region.title %>
+							Region: <%= region.title %>
 					.row-fluid
 						.span12
-							Tariff : <%= alternate_tariff.tariff_label %>
+							Tariff: <%= alternate_tariff.tariff_label %>
 			.row-fluid
 				.span12
 					:plain
 						<% if(saving_reward.title != "nothing") { %>
-							<h3>That's enough saving to purchase a <%= saving_reward.title %><h3>
+							<h3>That's enough saving to purchase <%= saving_reward.title %><h3>
 						<% } %>
 				
 %script{:type => "text/template", :id => "tariff_selector"}
@@ -193,9 +195,9 @@
 					%h3
 						Welcome to the 24/365 challenge.
 					%h4
-						Your task is to record your energy use for 24 hours. By using our control panel, you can see how much you are spending, as your appliances are running. Simply select your region, provider &#38; tariff in the top right section of the screen, and your spending total will adjust to your tariff. Your initial total will be your tariff&#39;s standing charge.</br></br>
+						Your task is to record your energy use for 24 hours. By using our control panel, you can see how much you are spending, as your appliances are running. Simply select your region, provider &#38; tariff in the top right section of the screen, and your spending total will adjust to your tariff.</br></br> Your initial total will be your tariff&#39;s standing charge.</br></br>
 						You turn an appliance&#39;s timer on or off by pressing the large grey button- you can&#39;t miss it&#33; By doing so you can see how much that appliance is costing you in real time.</br></br>
-						As for the &#39;365&#39; part of the challenge- by clicking &#39;My savings&#39; you can actually see how much your energy use would cost you yearly. </br></br>
+						By clicking &#39;My savings&#39; you can actually see how much your energy use would cost you annually. </br></br>
 				#info_box_2
 					%h4
 						The savings can be quite substantial- and if you are lucky, there will be alternative tariffs in your region which will shrink your bill without you having to reduce your usage.</br></br>
@@ -220,7 +222,7 @@
 							%span{:class => "glyphicon glyphicon-remove"}
 %script{:type => "text/template", :id => "summary_frame_template"}
 	:plain
-		<% console.log() %>
+
 %script{:type => "text/template", :id => "info_frame_end_template"}
 	#info_frame
 		.row-fluid
@@ -237,6 +239,14 @@
 					%h4
 						Hopefully over the last 24 hours you managed to successfully record your energy usage. If not, don't worry, you can always press "Reset app"
 						at the bottom of the page in order to try again.</br></br>
-						It is now that you can fully get an idea of how much you spend a year on your current tariff. Why not see how much you can save by pressing "My savings"
-						to get an overall impression of your yearly spend.</br></br>
+						Perhaps now you can get an overall impression of how much you spend a year on your current tariff. Why not see how much you can save by pressing "My savings"
+						to get an idea of your annual spend based on your complete day's worth of data.</br></br>
 						Your control panel has now stopped but you can view your timings. Why not give the challenge another go?
+
+%script{:type => "text/template", :id => "summary_reload_frame_template"}
+	.row-fluid
+		.span8
+			%h3
+				Recalculating
+		.span4
+			%img{:src => "/img/reload.gif"}

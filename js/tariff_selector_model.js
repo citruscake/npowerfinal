@@ -71,8 +71,6 @@
           return tariff.tariff_id;
         });
         tariff_id = _.first(tariff_ids);
-        console.log(event.target.value);
-        console.log(region_id + " " + provider_id + " " + tariff_id);
         window.user.set({
           provider_id: provider_id,
           tariff_id: tariff_id
@@ -89,16 +87,18 @@
           tariff_id: tariff_id
         });
         window.user.save();
-        console.log("saved " + window.user.get('region_id') + "," + window.user.get('provider_id') + "," + window.user.get('tariff_id'));
         return this.updateTariffData();
       },
       updateTariffData: function() {
         var tariff_data, tariff_id;
         tariff_data = this.model.get('tariff_data');
         tariff_id = window.user.get('tariff_id');
-        return window.tariff = _.find(tariff_data, function(tariff) {
+        window.tariff = _.find(tariff_data, function(tariff) {
           return tariff.tariff_id === tariff_id;
         });
+        if (window.current_page === "summary") {
+          return $('#summary_view_link').trigger('click');
+        }
       },
       render: function(user_data) {
         var attributes;

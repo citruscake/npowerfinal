@@ -22,7 +22,6 @@
 	margin-top : 100px
 	width : 400px
 	background-color : #222222
-	padding : 15px 10px 15px 10px
 	border-radius : 3px
 	h3
 		font-family : sans-serif
@@ -137,12 +136,13 @@ body
 			.row-fluid
 				#totals_frame
 					height : 50px
-					width : 280px
+					width : 500px
 					//background-color : #cccccc
 					margin-top : 10px
 					margin-right : 10px
+					color : #666666
 					#total_left_frame
-						width : 140px
+						width : 145px
 						#total_time_label
 							margin : 0px
 						#total_time
@@ -156,18 +156,19 @@ body
 							//margin-left : 110px
 							margin-top : 3px
 					#total_right_frame
-						width : 220px
+						text-align : right
+						display : inline-block
 						#total_cost_label
+							text-align : left
 							margin : 0px
 						#total_cost
 							height : 60px
 							//width : 250px
 							//background-color : #aaaaaa
-							font-size : 60px
+							font-size : 50px
 							//font-family : poiret-one, sans-serif
 							font-family : Fredoka One, sans-serif
-							line-height : 60px
-							padding : 6px 0px 0px 0px
+							line-height : 50px
 							margin-right : 5px
 							color : #eeeeee
 			.row-fluid
@@ -175,7 +176,7 @@ body
 					margin-top: -11px
 					min-width: 508px
 					margin-right : 7px
-					color : #333333
+					color : #666666
 					#label_frame
 						margin-bottom : 2px
 						#region_label
@@ -235,14 +236,14 @@ body
 			text-align : right
 			width : 80px
 			a
-				color : #555555
+				color : #666666
 				text-decoration : underline
 		#welcome_frame
 			width : 200px
 			padding-top : 5px
-			padding-right : 10px
+			padding-right : 5px
 			text-align : right
-			color : #555555
+			color : #666666
 	
 	#info_frame_container
 		height : 100%
@@ -276,9 +277,11 @@ body
 				position : absolute
 			#info_box_1
 				@include info_box
+				padding : 15px 10px 0px 10px
 				margin-left : 30px
 			#info_box_2
 				@include info_box
+				padding : 15px 10px 15px 10px
 				margin-left : 470px
 				h4
 					margin-top : 5px
@@ -334,7 +337,7 @@ body
 				@include info-box
 				margin-top : 45px
 				margin-left : 30px
-				width : 860px
+				width : 840px
 				height : 300px
-				
+				padding : 15px 10px 15px 10px
 					

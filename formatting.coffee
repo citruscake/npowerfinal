@@ -1,4 +1,4 @@
-window.formatTimestamp = (timestamp, toString=true) ->
+window.formatTimestamp = (timestamp, toString=true, includeMilliseconds=true) ->
 	time = new Date timestamp
 	formatted_hours = String time.getHours()
 	formatted_minutes = String time.getMinutes()
@@ -18,7 +18,9 @@ window.formatTimestamp = (timestamp, toString=true) ->
 	
 	if toString == true
 		#formatted_time = formatted_hours + ":" + formatted_minutes + ":" + formatted_seconds + ":" + formatted_milliseconds
-		formatted_time = formatted_hours + "h " + formatted_minutes + "m " + formatted_seconds + "s " + formatted_milliseconds + "ms"
+		formatted_time = formatted_hours + "h " + formatted_minutes + "m " + formatted_seconds + "s "
+		if (includeMilliseconds == true)
+			formatted_time +=  formatted_milliseconds + "ms"
 	else
 		formatted_time = Array()
 		if parseInt(formatted_hours) > 0
@@ -35,15 +37,16 @@ window.formatTimestamp = (timestamp, toString=true) ->
 			formatted_time.push formatted_seconds
 		else
 			formatted_time.push ""
-			
-		if parseInt(formatted_milliseconds) > 0
-			formatted_time.push formatted_milliseconds
-		else
-			formatted_time.push ""
+		
+		if (includeMilliseconds == true)
+			if parseInt(formatted_milliseconds) > 0
+				formatted_time.push formatted_milliseconds
+			else
+				formatted_time.push ""
 
 	return formatted_time
 		
 window.formatCurrency = (amount, toFixed=2) ->
 	currency_string = "&#163;"+String(amount.toFixed(toFixed))
-	#console.log currency_string
+
 	return currency_string

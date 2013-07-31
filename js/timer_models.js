@@ -28,7 +28,7 @@
       },
       timerToggle: function() {
         var appliance_id, data, is_active, timer, timestamp;
-        if (($('#app_container').data('complete') === false) && ($('#app_container').data('disable') === false)) {
+        if ((($('#app_container').data('complete') === true) && (window.ignoreDisable === true)) || (($('#app_container').data('complete') === false) && ($('#app_container').data('disable') === false))) {
           $('#app_container').data('disable', true);
           setTimeout(function() {
             return $('#app_container').data('disable', false);
@@ -50,7 +50,6 @@
           return $.post('/timer/storeTimestamp', data, function(response) {
             var start_timestamp, total_timestamp;
             response = JSON.parse(response);
-            console.log("IS_ACTIVE " + response.is_active);
             if (response.is_active === 0) {
               start_timestamp = timer.model.get('start_timestamp');
               total_timestamp = timer.model.get('total_timestamp');
@@ -85,7 +84,6 @@
         cost = $('#' + appliance_id + '.cost-display');
         time = $('#' + appliance_id + '.time-display');
         name = $('#' + appliance_id + '.name');
-        console.log(button);
         if (is_active === 0) {
           button.animate({
             'background-color': '#666666'
@@ -125,8 +123,6 @@
         this.template = this['template1'];
         attributes = $.extend(this.model.toJSON(), appliance.toJSON());
         this.$el.html(this.template(attributes));
-        console.log("attributes...");
-        console.log(attributes);
         $(this.el).addClass('thumbnail');
         $(this.el).attr('id', appliance.get('appliance_id'));
         $(this.el).find('.timer-display').attr('id', appliance.get('appliance_id'));
